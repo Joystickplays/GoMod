@@ -1017,5 +1017,4 @@ async def createlogging(ctx):
 #     # blocked lol
             
 
-print("Running token...")
 bot.run(token)
