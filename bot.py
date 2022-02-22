@@ -218,7 +218,7 @@ async def on_ready():
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send(f"You do not have permission to run this command.")
-    elif isinstance(error, commands.MissingRequiredArgument):
+    elif isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.ChannelNotFound) or isinstance(error, commands.MemberNotFound):
         await ctx.send(f"{error}")
     else:
         print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
