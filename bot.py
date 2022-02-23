@@ -2,6 +2,7 @@ print('Init..')
 import discord
 
 from discord.ext import commands, tasks
+import os
 
 import asyncio
 import asyncpg
@@ -15,8 +16,9 @@ import traceback
 import sys
 import json
 
- 
-print("Hold...")
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 async def delallchannels(context):
@@ -172,9 +174,10 @@ def evalu(msg, tokens):
             max_tokens=tokens
         )
 
-openai.api_key = "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"
-# OTQ1MTAyNDI3NDU4MjQ4NzY0.YhLROQ.gMKoGJ8G_ZML456TNRc0Q5Xbs-8
-token = "OTQwMDM4MDE0MTUzOTQ5MjU0.YgBknw.ExvxfT-oli3Xeb_kSDrUkLzxS4Y"
+
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+
 activity = discord.Activity(name='for rulebreakers', type=discord.ActivityType.watching)
 intents = discord.Intents.default()
 intents.members = True
@@ -183,13 +186,13 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or("--"), activity=act
 bot.remove_command("help")
 bot.logcache = list()
 bot.topggheaders = {
-    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk0MDAzODAxNDE1Mzk0OTI1NCIsImJvdCI6dHJ1ZSwiaWF0IjoxNjQ1NDAzMjc5fQ.Tf27OKUVuSnXxTbegrj1FQELueXo0mpkpvkO8mQ36ig"
+    "Authorization": os.environ.get("TOPGG_TOKEN")
 }
 db_credentials = {
-    'host': 'ec2-34-233-157-189.compute-1.amazonaws.com',
-    'user': 'cfemrvtyaltrlk',
-    'password': '1f5425291ebff06f270ae35ce82b655c350b52395f3fdf07601c255dcfe960a5',
-    'database': 'd8bubmi4p35o5l'
+    'host': os.environ.get("DB_HOST"),
+    'user': os.environ.get("DB_USER"),
+    'password': os.environ.get("DB_PASSWORD"),
+    'database': os.environ.get("DB_NAME")
 }
 # db_credentials = {
 #     'host': 'castor.db.elephantsql.com',
@@ -1015,4 +1018,4 @@ async def createlogging(ctx):
 #     # blocked lol
             
 
-bot.run(token)
+bot.run(os.environ.get("BOT_TOKEN"))
