@@ -748,18 +748,6 @@ async def block(ctx, member: discord.Member):
     embed = discord.Embed(title="Blocked", description=f"{member.mention} has been blocked from {ctx.channel.mention}", color=0x00b2ff)
     await ctx.send(embed=embed)
 
-@bot.command()
-@commands.has_permissions(manage_messages=True, manage_channels=True)
-async def unblock(ctx, member: discord.Member):
-    if member == ctx.author:
-        await ctx.send("You cannot unblock yourself.", delete_after=3)
-        return
-    if member.top_role >= ctx.author.top_role:
-        await ctx.send("You cannot unblock members with a higher role than you.", delete_after=3)
-        return
-    await ctx.channel.set_permissions(member, add_reactions = True, send_messages = True)
-    embed = discord.Embed(title="Unblocked", description=f"{member.mention} has been unblocked from {ctx.channel.mention}", color=0x00b2ff)
-    await ctx.send(embed=embed)
 
 @bot.command()
 @commands.has_permissions(manage_messages=True)
