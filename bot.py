@@ -1,10 +1,8 @@
-print('Importing discord...')
+print('Init...')
 import discord
 
-print('Importing commands...')
 from discord.ext import commands, tasks
 
-print('Importing asyncio...')
 import asyncio
 import asyncpg
 import aiohttp
