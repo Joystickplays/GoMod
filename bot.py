@@ -307,8 +307,8 @@ async def help(ctx):
             viewthing.other.style = discord.ButtonStyle.green
             embed = discord.Embed(title="Other help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
             embed.add_field(name="--vote", value="Show us some love by voting us on top.gg!", inline=False)
-            embed.add_field("--t <tag name>", value="Quickly send a message using the specified tag.", inline=False)
-            embed.add_field("--t create <tag name> <message>", value="Creates a tag with the name and message included.", inline=False)
+            embed.add_field(name="--tag/t <tag name>", value="Quickly send a message using the specified tag.", inline=False)
+            embed.add_field(name="--tag/t create <tag name> <message>", value="Creates a tag with the name and message included.", inline=False)
 
         if chosen == "s":
             viewthing.server.disabled = True
