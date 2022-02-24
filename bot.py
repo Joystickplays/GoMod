@@ -99,12 +99,12 @@ ssl_object = ssl.create_default_context()
 ssl_object.check_hostname = False
 ssl_object.verify_mode = ssl.CERT_NONE
 bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_credentials, ssl=ssl_object))
-# cogs = [
-#     "cogs.moderation"
-# ]
+cogs = [
+    "cogs.moderation"
+]
 
-# for cog in cogs:
-#     bot.load_extension(cog)
+for cog in cogs:
+    bot.load_extension(cog)
 
 @bot.event
 async def on_ready():
