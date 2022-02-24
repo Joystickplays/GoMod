@@ -307,6 +307,8 @@ async def help(ctx):
             viewthing.other.style = discord.ButtonStyle.green
             embed = discord.Embed(title="Other help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
             embed.add_field(name="--vote", value="Show us some love by voting us on top.gg!", inline=False)
+            embed.add_field("--t <tag name>", value="Quickly send a message using the specified tag.", inline=False)
+            embed.add_field("--t create <tag name> <message>", value="Creates a tag with the name and message included.", inline=False)
 
         if chosen == "s":
             viewthing.server.disabled = True
@@ -908,6 +910,32 @@ async def createlogging(ctx):
 
 #     # blocked lol
             
+@bot.group(invoke_without_command=True, aliases=["t"])
+async def tag(ctx, tag):
+    lookup = await bot.db.fetchrow("SELECT * FROM tags WHERE tagname = $1 AND serverid = $2", tag, ctx.guild.id)
+    if lookup is None:
+        embed = discord.Embed(title="Tag", description=f"Tag `{tag}` does not exist.", color=0x00b2ff)
+        await ctx.send(embed=embed)
+        return
+    await ctx.send(lookup["tagcontent"])
+
+@tag.command()
+async def create(ctx, tag, *, content):
+    if len(tag) > 254:
+        embed = discord.Embed(title="Tag", description="Tag name too long.", color=0x00b2ff)
+        await ctx.send(embed=embed)
+        return
+
+    lookup = await bot.db.fetchrow("SELECT * FROM tags WHERE tagname = $1 AND serverid = $2", tag, ctx.guild.id)
+    if lookup is not None:
+        embed = discord.Embed(title="Tag", description=f"Tag `{tag}` already exists.", color=0x00b2ff)
+        await ctx.send(embed=embed)
+        return
+
+    await bot.db.execute("INSERT INTO tags (tagname, tagcontent, serverid) VALUES ($1, $2, $3)", tag, content, ctx.guild.id)
+    embed = discord.Embed(title="Tag", description=f"Tag `{tag}` created.", color=0x00b2ff)
+    await ctx.send(embed=embed)
+
 if __name__ == "__main__":
     if os.environ.get("BOT_ENV") == "development":
         bot.run(os.environ.get("BETA_BOT_TOKEN"))
