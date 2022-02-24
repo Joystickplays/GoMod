@@ -605,23 +605,23 @@ async def settings(ctx):
     embed = discord.Embed(title="Coming soon", description="This command is still in development. But don't expect too much.", color=0x00b2ff)
     await ctx.send(embed=embed)
 
-@bot.command()
-@commands.has_guild_permissions(kick_members=True)
-async def kick(ctx, member: discord.Member, *, reason: str = None):
-    if member == ctx.author:
-        await ctx.send("You cannot kick yourself.", delete_after=3)
-        return
-    if member.top_role >= ctx.author.top_role:
-        await ctx.send("You cannot kick members with a higher role than you.", delete_after=3)
-        return
-    try:
-        embed = discord.Embed(title=f"Kicked from {ctx.guild.name}", description=f"You have been kicked from {ctx.guild.name} by {ctx.author.name} with reason: {reason}", color=discord.Color.red())
-        await member.send(embed=embed)
-    except:
-        pass
-    await ctx.guild.kick(member, reason=reason)
-    embed = discord.Embed(title="Kicked", description=f"{member.mention} has been kicked from {ctx.guild.name} with reason: {reason}", color=0x00b2ff)
-    await ctx.send(embed=embed)
+# @bot.command()
+# @commands.has_guild_permissions(kick_members=True)
+# async def kick(ctx, member: discord.Member, *, reason: str = None):
+#     if member == ctx.author:
+#         await ctx.send("You cannot kick yourself.", delete_after=3)
+#         return
+#     if member.top_role >= ctx.author.top_role:
+#         await ctx.send("You cannot kick members with a higher role than you.", delete_after=3)
+#         return
+#     try:
+#         embed = discord.Embed(title=f"Kicked from {ctx.guild.name}", description=f"You have been kicked from {ctx.guild.name} by {ctx.author.name} with reason: {reason}", color=discord.Color.red())
+#         await member.send(embed=embed)
+#     except:
+#         pass
+#     await ctx.guild.kick(member, reason=reason)
+#     embed = discord.Embed(title="Kicked", description=f"{member.mention} has been kicked from {ctx.guild.name} with reason: {reason}", color=0x00b2ff)
+#     await ctx.send(embed=embed)
 
 @bot.command()
 @commands.has_permissions(ban_members=True)
