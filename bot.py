@@ -15,6 +15,7 @@ import random
 import traceback
 import sys
 import json
+import ssl
 
 from dotenv import load_dotenv
 
@@ -194,7 +195,10 @@ db_credentials = {
     'password': os.environ.get("DB_PASSWORD"),
     'database': os.environ.get("DB_NAME")
 }
-bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_credentials))
+ssl_object = ssl.create_default_context()
+ssl_object.check_hostname = False
+ssl_object.verify_mode = ssl.CERT_NONE
+bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_credentials, ssl=ssl_object))
 
 @bot.event
 async def on_ready():
