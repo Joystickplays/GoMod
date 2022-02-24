@@ -194,12 +194,6 @@ db_credentials = {
     'password': os.environ.get("DB_PASSWORD"),
     'database': os.environ.get("DB_NAME")
 }
-# db_credentials = {
-#     'host': 'castor.db.elephantsql.com',
-#     'user': 'iexgmqpr',
-#     'password': 'gTPhwPQ7mSBLad4gH0oSGCqMUDqjBEYu',
-#     'database': 'iexgmqpr'
-# }
 bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_credentials))
 
 @bot.event
