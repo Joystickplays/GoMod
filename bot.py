@@ -188,13 +188,13 @@ bot.logcache = list()
 bot.topggheaders = {
     "Authorization": os.environ.get("TOPGG_TOKEN")
 }
-db_credentials = {
-    'host': os.environ.get("DB_HOST"),
-    'user': os.environ.get("DB_USER"),
-    'password': os.environ.get("DB_PASSWORD"),
-    'database': os.environ.get("DB_NAME")
-}
-bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_credentials))
+# db_credentials = {
+#     'host': os.environ.get("DB_HOST"),
+#     'user': os.environ.get("DB_USER"),
+#     'password': os.environ.get("DB_PASSWORD"),
+#     'database': os.environ.get("DB_NAME")
+# }
+bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.connect(os.environ.get("DB_URL"), ssl=True))
 
 @bot.event
 async def on_ready():
