@@ -19,6 +19,8 @@ import ssl
 
 from dotenv import load_dotenv
 
+from views import Caseactionsview, Helpview
+
 load_dotenv()
 
 
@@ -243,12 +245,9 @@ async def on_message(message):
             if ignoreduser["userid"] == message.author.id:
                 return
 
-        print("Evaluating")
-
         completion = evalu("Things to know:\n- THIS IS VERY IMPORTANT! CONSIDER \"YES\" AS SAFE.\n- If the message mentions they hate a person, consider it as hate.\n- If the message mentions they hate an object, consider it safe.\n- If the message mentions they hate PEOPLE who HATES an object, consider it as hate.\n- If the message has sexual assault towards a person, consider it as harassment.\n- If the message has explicit words, consider it as adult content.\n- If the message is someone screaming (like \"AAAAAAAAAAAAA\"), consider it safe.\n-- (IMPORTANT) If the message has only 1 letter but may complete to an explicit word (like \"d\"), consider it SAFE.\n-- If the message has explicit words, but not too explicit (like \"frick\", \"dang\", etc.), consider it safe.\n- If the message has unrecognized words (like \"bruh\", \"noway\", \"amogus\", \"i forgot\", etc.), consider it safe.\n-- If the message has unrecognized words BUT RESEMBLES A SWEAR (like \"pvvsy\", \"f3ck\", \"sh1t\"), consider it as adult content.\n- If the message has shortened explicit words (like \"fk\", \"btch\", etc.), consider it as adult content.\n- If the message has misspelled mild explicit words (Like \"fricl\", etc.), consider it safe.\n-If the message has random numbers (like \"234739\", \"333822\", etc.), consider it safe.\n-If the message has an unrecognized set of patterns (like \"--case 838374\", \"?ban\", etc.), consider it safe.\n- If the message has someone having problems with their mental health (like \"Im getting insane\", etc.), consider it safe.\n- If the message has emoticons (like \":P\", \":O\", \":)\", \"xD\", \"Xd\", \":-)\", etc.), consider it safe.\n- If the message only has 1 letter, consider it safe.\n- If the message is random characters (like \"dsfhiufhudsafjddi\", \"dksfjsdksksksfksfjdks\", \"epoiwfjoheroe\", etc.), consider it SAFE.\n- If the message is random characters (like \"dsfhiufhudsafjddi\", \"dksfjsdksksksfksfjdks\", \"epoiwfjoheroe\", etc.), consider it SAFE.\n- If the message is literally the word \"hate\",  consider it SAFE.\n- If the message is literally the word \"adult content\",  consider it SAFE.\n- If the message is literally the word \"harassment\",  consider it SAFE.\n\nClassify the following message if it has hate, or adult content, or harassment using the points provided:\n\n\"" + message.content +"\"\n\nResult:", 16)
 
         result = completion.choices[0].text.lower()
-        print(result + "\nTime taken: " + str(time.time() - timestart))
 
         if "none" in result or "not" in result or "no" in result or "safe" in result:
             return
