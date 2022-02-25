@@ -10,7 +10,7 @@ class Moderation(commands.Cog):
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         print(1)
-        lookup = self.bot.fetchrow("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
+        lookup = self.bot.db.fetchrow("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
         if lookup:
             print(2)
             if reaction.emoji.id == lookup['reaction']:
