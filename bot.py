@@ -99,7 +99,7 @@ ssl_object = ssl.create_default_context()
 ssl_object.check_hostname = False
 ssl_object.verify_mode = ssl.CERT_NONE
 bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_credentials, ssl=ssl_object))
-bot.cogs = [
+cogs = [
     "cogs.moderation",
     "cogs.aimod",
     "cogs.tags",
@@ -247,7 +247,13 @@ async def unloadcog(ctx, cog):
 @bot.command()
 @commands.is_owner()
 async def reloadallcogs(ctx):
-    for cog in bot.cogs:
+    cogs = [
+    "cogs.moderation",
+    "cogs.aimod",
+    "cogs.tags",
+    "cogs.logging"
+    ]
+    for cog in cogs:
         try:
             bot.unload_extension(f"cogs.{cog}")
             bot.load_extension(f"cogs.{cog}")
