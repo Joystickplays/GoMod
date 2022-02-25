@@ -305,4 +305,4 @@ class AiMod(commands.Cog):
 
 
 def setup(bot:GoModBot):
-    bot.add_cog(Moderation(bot))
+    bot.add_cog(AiMod(bot))
