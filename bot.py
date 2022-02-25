@@ -1,4 +1,4 @@
-print('Init..')
+print('Loading cogs...')
 import discord
 
 from discord.ext import commands, tasks
@@ -102,6 +102,8 @@ bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_cr
 cogs = [
     "cogs.moderation",
     "cogs.aimod",
+    "cogs.tags",
+    "cogs.logging"
 ]
 
 for cog in cogs:
@@ -144,69 +146,6 @@ async def on_guild_channel_delete(channel):
             await bot.db.execute("DELETE FROM ignoredchannels WHERE serverid = $1", channel.guild.id)
             embed = discord.Embed(title="Logging channel deleted", description=f"Logs channel for your server `{channel.guild.name}` has been unexpectedly deleted. You will need to restart setup to fix this.", color=discord.Color.red())
             await channel.guild.owner.send(embed=embed)
-
-@bot.event
-async def on_message_edit(messagebefore, messageafter):
-    if messagebefore.author.bot:
-        return
-    if messagebefore.guild is None:
-        return
-
-    for record in bot.logcache:
-        if record["guildid"] == messagebefore.guild.id and record["loggingtype"] == "e":
-            channel = bot.get_channel(record["channelid"])
-            if channel is None:
-                return
-            embed = discord.Embed(title="Message edited", description=f"The following message was edited in `{messagebefore.channel.name}` by `{messagebefore.author.name}`:\n\nFrom:\n```\n{messagebefore.content}\n```\nTo:\n```{messageafter.content}```", color=discord.Color.orange())
-            await channel.send(embed=embed)
-            return
-    
-    logs = await bot.db.fetch("SELECT * FROM logch")
-    for log in logs:
-        tempdict = {}
-        tempdict["guildid"] = log["guildid"]
-        tempdict["channelid"] = log["channelid"]
-        tempdict["loggingtype"] = log["loggingtype"]
-        bot.logcache.append(tempdict)
-        if log["guildid"] == messagebefore.guild.id and log["loggingtype"] == "e":
-            channel = bot.get_channel(record["channelid"])
-            if channel is None:
-                return
-            embed = discord.Embed(title="Message edited", description=f"The following message was edited in `{messagebefore.channel.name}` by `{messagebefore.author.name}`:\n\nFrom:\n```\n{messagebefore.content}\n```\nTo:\n```{messageafter.content}```", color=discord.Color.orange())
-            await channel.send(embed=embed)
-            return
-
-
-@bot.event
-async def on_message_delete(message):
-    if message.author.bot:
-        return
-    if message.guild is None:
-        return
-
-    for record in bot.logcache:
-        if record["guildid"] == message.guild.id and record["loggingtype"] == "e":
-            channel = bot.get_channel(record["channelid"])
-            if channel is None:
-                return
-            embed = discord.Embed(title="Message deleted", description=f"The following message was deleted in `{message.channel.name}` by `{message.author.name}`:\n\n```\n{message.content}\n```", color=discord.Color.red())
-            await channel.send(embed=embed)
-            return
-    
-    logs = await bot.db.fetch("SELECT * FROM logch")
-    for log in logs:
-        tempdict = {}
-        tempdict["guildid"] = log["guildid"]
-        tempdict["channelid"] = log["channelid"]
-        tempdict["loggingtype"] = log["loggingtype"]
-        bot.logcache.append(tempdict)
-        if log["guildid"] == message.guild.id and log["loggingtype"] == "e":
-            channel = bot.get_channel(log["channelid"])
-            if channel is None:
-                return
-            embed = discord.Embed(title="Message deleted", description=f"The following message was deleted in `{message.channel.name}` by `{message.author.name}`:\n\n```\n{message.content}\n```", color=discord.Color.red())
-            await channel.send(embed=embed)
-            return
 
 @bot.event
 async def on_guild_remove(guild):
@@ -389,55 +328,6 @@ async def vote(ctx):
             if data['voted'] == 1:
                 await msg.edit(embed=discord.Embed(title="Vote", description="Yay! It looks like you already voted for this bot. Thank you!", color=0x00b2ff))
 
-@bot.command()
-@commands.has_permissions(manage_messages=True)
-async def createlogging(ctx):
-    embed = discord.Embed(title="Logging setup", description=f"You will setup the channel {ctx.channel.mention}. Continue?", color=0x00b2ff)
-    msg = await ctx.send(embed=embed)
-    await msg.add_reaction("✅")
-    await msg.add_reaction("❌")
-    def check(reaction, user):
-        return user == ctx.author and reaction.message.id == msg.id and str(reaction.emoji) in ["✅", "❌"]
-    try:
-        reaction, user = await bot.wait_for('reaction_add', check=check, timeout=60)
-    except asyncio.TimeoutError:
-        await msg.edit(embed=discord.Embed(title="Logging setup", description="Timed out.", color=0x00b2ff))
-        return
-
-    if str(reaction.emoji) == "❌":
-        await msg.edit(embed=discord.Embed(title="Logging setup", description="Cancelled.", color=0x00b2ff))
-        return
-
-    embed = discord.Embed(title="Logging setup", description="Do you want to make the channel a deletion log or edit log?", color=0x00b2ff)
-    msg = await ctx.send(embed=embed)
-    await msg.add_reaction("🗑")
-    await msg.add_reaction("📝")
-    
-    def check(reaction, user):
-        return user == ctx.author and reaction.message.id == msg.id and str(reaction.emoji) in ["🗑", "📝"]
-    try:
-        reaction, user = await bot.wait_for('reaction_add', check=check, timeout=60)
-    except asyncio.TimeoutError:
-        await msg.edit(embed=discord.Embed(title="Logging setup", description="Timed out.", color=0x00b2ff))
-        return
-    
-    if str(reaction.emoji) == "🗑":
-        embed = discord.Embed(title="Setting...", description="Setting up deletion logging...", color=0x00b2ff)
-        await ctx.send(embed=embed)
-
-        await bot.db.execute("INSERT INTO logch (channelid, loggingtype, guildid) VALUES ($1, $2, $3)", ctx.channel.id, "d", ctx.guild.id)
-
-        embed = discord.Embed(title="Logging setup", description="Complete! To test, try deleting a message.", color=0x00b2ff)
-        await ctx.send(embed=embed)
-    elif str(reaction.emoji) == "📝":
-        embed = discord.Embed(title="Setting...", description="Setting up edit logging...", color=0x00b2ff)
-        await ctx.send(embed=embed)
-
-        await bot.db.execute("INSERT INTO logch (channelid, loggingtype, guildid) VALUES ($1, $2, $3)", ctx.channel.id, "e", ctx.guild.id)
-
-        embed = discord.Embed(title="Logging setup", description="Complete! To test, try editing a message.", color=0x00b2ff)
-        await ctx.send(embed=embed)
-
 # @bot.command()
 # @commands.has_permissions(manage_guild=True)
 # async def createbackup(ctx):
@@ -526,32 +416,6 @@ async def createlogging(ctx):
 
 
 #     # blocked lol
-            
-@bot.group(invoke_without_command=True, aliases=["t"])
-async def tag(ctx, tag):
-    lookup = await bot.db.fetchrow("SELECT * FROM tags WHERE tagname = $1 AND serverid = $2", tag, ctx.guild.id)
-    if lookup is None:
-        embed = discord.Embed(title="Tag", description=f"Tag `{tag}` does not exist.", color=0x00b2ff)
-        await ctx.send(embed=embed)
-        return
-    await ctx.send(lookup["tagcontent"])
-
-@tag.command()
-async def create(ctx, tag, *, content):
-    if len(tag) > 254:
-        embed = discord.Embed(title="Tag", description="Tag name too long.", color=0x00b2ff)
-        await ctx.send(embed=embed)
-        return
-
-    lookup = await bot.db.fetchrow("SELECT * FROM tags WHERE tagname = $1 AND serverid = $2", tag, ctx.guild.id)
-    if lookup is not None:
-        embed = discord.Embed(title="Tag", description=f"Tag `{tag}` already exists.", color=0x00b2ff)
-        await ctx.send(embed=embed)
-        return
-
-    await bot.db.execute("INSERT INTO tags (tagname, tagcontent, serverid) VALUES ($1, $2, $3)", tag, content, ctx.guild.id)
-    embed = discord.Embed(title="Tag", description=f"Tag `{tag}` created.", color=0x00b2ff)
-    await ctx.send(embed=embed)
 
 if __name__ == "__main__":
     if os.environ.get("BOT_ENV") == "development":
