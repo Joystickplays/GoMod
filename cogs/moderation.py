@@ -28,7 +28,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member: discord.Member, *, reason: str = None):
         if member == ctx.author:
-            await ctx.send("You cannot ban yourself.", delete_after=3)
+            await ctx.send("You cannot ban yourself..", delete_after=3)
             return
         if member.top_role >= ctx.author.top_role:
             await ctx.send("You cannot ban members with a higher role than you.", delete_after=3)

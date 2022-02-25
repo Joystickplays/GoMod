@@ -282,7 +282,7 @@ async def reloadcog(ctx, cog):
     try:
         bot.unload_extension(f"cogs.{cog}")
         bot.load_extension(f"cogs.{cog}")
-        await ctx.send(f"Reloaded {cog}")
+        await ctx.send(f"Reloaded {cog}!")
     except Exception as e:
         await ctx.send(f"Error: {e}")
 
