@@ -148,6 +148,7 @@ class Moderation(commands.Cog):
     @commands.command()
     async def test(self, ctx):
         await ctx.send(ctx.message.content)
+        print(ctx.message.content)
 
     # @commands.command()
     # @commands.has_guild_permissions(manage_messages=True)
