@@ -148,7 +148,7 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     async def reactrole(self, ctx):
-        embed = discord.Embed(title="Reaction role setup", description="1/4\nWhat channel is the message you're using is in?", color=0x00b2ff)
+        embed = discord.Embed(title="Reaction role setup", description="1/4\nWhat channel is the message you're using is in? (Do NOT mention the channel. Instead, use the name.", color=0x00b2ff)
         msg = await ctx.send(embed=embed)
 
         def check(m):
