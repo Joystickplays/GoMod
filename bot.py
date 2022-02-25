@@ -269,16 +269,17 @@ async def help(ctx):
         viewthing = Helpview(ctx)
         if chosen == "a":
             viewthing.ai.disabled = True
-            viewthing.ai.style = discord.ButtonStyle.green
-            embed = discord.Embed(title="AiMod help", description="You discovered a BETA feature!\nUs at the GoMod team has made a feature for GoMod, AiMod, your AI moderator. This helps moderators review potentially message that contain either hate, adult content or harassment using artificial intelligence. **Be aware that this is BETA and false reports may happen.**\n\nTip:\n<required>\n[optional]", color=0x00b2ff)
-            embed.add_field(name="--setup", value="Sets up AiMod to your liking. This command will be necessary when you first invite it to a new server.", inline=False)
+            viewthing.ai.style = discord.ButtonStyle.red
+            # embed = discord.Embed(title="AiMod help", description="You discovered a BETA feature!\nUs at the GoMod team has made a feature for GoMod, AiMod, your AI moderator. This helps moderators review potentially message that contain either hate, adult content or harassment using artificial intelligence. **Be aware that this is BETA and false reports may happen.**\n\nTip:\n<required>\n[optional]", color=0x00b2ff)
+            embed = discord.Embed(title="AiMod help", description="You may (or may not) remember there were a few more commands here, but the reason for that is we disabled them temporarily. When we will enable them back? No one knows.\n\nTip:\n<required>\n[optional]", color=0x00b2ff)
+            # embed.add_field(name="--setup", value="Sets up AiMod to your liking. This command will be necessary when you first invite it to a new server.", inline=False)
             embed.add_field(name="--rulemaker", value="Makes a set of rules for you, according to your community.")
-            embed.add_field(name="--case <case ID>", value="Shows available actions you can do on a case. Case ID can be obtained from your log channel.", inline=False)
-            embed.add_field(name="--ignorechannel <channel>", value="AiMod will ignore this channel.", inline=False)
-            embed.add_field(name="--unignorechannel <channel>", value="If ignored previously, AiMod will not ignore this channel.", inline=False)
-            embed.add_field(name="--ignoreuser <member>", value="AiMod will ignore this user.", inline=False)
-            embed.add_field(name="--unignoreuser <member>", value="If ignored previously, AiMod will not ignore this user.", inline=False)
-            embed.add_field(name="--settings", value="Shows the current settings of AiMod for this server.", inline=False)
+            # embed.add_field(name="--case <case ID>", value="Shows available actions you can do on a case. Case ID can be obtained from your log channel.", inline=False)
+            # embed.add_field(name="--ignorechannel <channel>", value="AiMod will ignore this channel.", inline=False)
+            # embed.add_field(name="--unignorechannel <channel>", value="If ignored previously, AiMod will not ignore this channel.", inline=False)
+            # embed.add_field(name="--ignoreuser <member>", value="AiMod will ignore this user.", inline=False)
+            # embed.add_field(name="--unignoreuser <member>", value="If ignored previously, AiMod will not ignore this user.", inline=False)
+            # embed.add_field(name="--settings", value="Shows the current settings of AiMod for this server.", inline=False)
 
         if chosen == "m":
             viewthing.mod.disabled = True
