@@ -19,7 +19,7 @@ import ssl
 
 from dotenv import load_dotenv
 
-from views import Caseactionsview, Helpview
+from cogs.views import Caseactionsview, Helpview
 
 load_dotenv()
 
