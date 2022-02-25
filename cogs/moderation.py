@@ -7,6 +7,20 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener
+    async def on_reaction_add(self, reaction, user):
+        lookup = self.bot.fetchrow("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
+        if lookup:
+            if reaction.emoji.id == lookup['reaction']:
+                role = discord.utils.get(user.guild.roles, id=lookup['role'])
+                if role == None:
+                    return
+
+                if role in user.roles:
+                    pass
+                else:
+                    await user.add_roles(role)
+
     @commands.command()
     @commands.has_guild_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason: str = None):
@@ -131,6 +145,10 @@ class Moderation(commands.Cog):
             embed.add_field(name=f"{warn['reason']}", value=f"Warned by {ctx.guild.get_member(warn['invokerid']).mention}", inline=False)
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def test(self, ctx):
+        await ctx.send(ctx.message.content)
+
     # @commands.command()
     # @commands.has_guild_permissions(manage_messages=True)
     # async def reactrole(self, ctx):
@@ -175,6 +193,7 @@ class Moderation(commands.Cog):
     #         await ctx.send("Timed out.", delete_after=3)
     #         return
 
+    #     reactionname = msg.content
     #     try:
     #         reaction = await message.add_reaction(msg.content)
     #     except:
@@ -195,7 +214,12 @@ class Moderation(commands.Cog):
     #         await ctx.send("That role doesn't exist.", delete_after=3)
     #         return
 
-    #     await self.bot.db.execute("INSERT INTO reactroles VALUES ($1, $2, $3)", message.id, channel.id, role.id)
+    #     await self.bot.db.execute("INSERT INTO reactroles VALUES ($1, $2, $3, $4)", message.id, channel.id, role.id, reactionname)
+    #     embed = discord.Embed(title="Reaction role setup", description="Reaction role setup complete.", color=0x00b2ff)
+    #     await ctx.send(embed=embed)
+
+
+
 
 def setup(bot:GoModBot):
     bot.add_cog(Moderation(bot))
