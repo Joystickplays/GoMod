@@ -298,7 +298,7 @@ class AiMod(commands.Cog):
         await setrules.edit(embed=embed)
 
     @rulemaker.error
-    async def rulemaker_error(ctx, error):
+    async def rulemaker_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             embed = discord.Embed(title="Rulemaker setup", description=f"You are on cooldown. Please try again in {round(error.retry_after / 60)} minutes.", color=0x00b2ff)
             await ctx.send(embed=embed)
