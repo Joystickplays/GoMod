@@ -18,7 +18,7 @@ def evalu(msg, tokens):
             max_tokens=tokens
         )
 
-class Moderation(commands.Cog):
+class AiMod(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
