@@ -106,7 +106,7 @@ cogs = [
     "cogs.logging"
 ]
 
-for cog in bot.cogs:
+for cog in cogs:
     bot.load_extension(cog)
 
 @bot.event
@@ -255,8 +255,8 @@ async def reloadallcogs(ctx):
     ]
     for cog in cogs:
         try:
-            bot.unload_extension(f"cogs.{cog}")
-            bot.load_extension(f"cogs.{cog}")
+            bot.unload_extension(f"{cog}")
+            bot.load_extension(f"{cog}")
         except Exception as e:
             await ctx.send(f"Error: {e}")
     await ctx.send("Reloaded all cogs!")
