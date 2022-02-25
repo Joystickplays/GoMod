@@ -161,55 +161,55 @@ async def on_guild_join(guild):
     await user.send(f"I have been added to a new server: {guild.name}")
     
 
-@bot.listen('on_message')
-async def on_message(message):
-    timestart = time.time()
-    if message.author.bot or message.guild == None:
-        return
+# @bot.listen('on_message')
+# async def on_message(message):
+#     timestart = time.time()
+#     if message.author.bot or message.guild == None:
+#         return
 
-    servercheck = await bot.db.fetch("SELECT * FROM discservers WHERE discordid = $1", message.guild.id)
+#     servercheck = await bot.db.fetch("SELECT * FROM discservers WHERE discordid = $1", message.guild.id)
 
-    if not servercheck == [] or servercheck == None:
-        warningchannel = bot.get_channel(servercheck[0]['warningch'])
+#     if not servercheck == [] or servercheck == None:
+#         warningchannel = bot.get_channel(servercheck[0]['warningch'])
 
 
-        if len(message.content) > 150:
-            return
+#         if len(message.content) > 150:
+#             return
 
-        if len(message.content) < 2:
-            return
+#         if len(message.content) < 2:
+#             return
 
-        if message.content.startswith("--"):
-            return
+#         if message.content.startswith("--"):
+#             return
 
-        if "adult content" in message.content.lower():
-            return
+#         if "adult content" in message.content.lower():
+#             return
 
-        disalloweds = await bot.db.fetch("SELECT * FROM ignoredchannels")
-        for disallowedentry in disalloweds:
-            if disallowedentry["channelid"] == message.channel.id:
-                return
+#         disalloweds = await bot.db.fetch("SELECT * FROM ignoredchannels")
+#         for disallowedentry in disalloweds:
+#             if disallowedentry["channelid"] == message.channel.id:
+#                 return
 
-        ignoredusers = await bot.db.fetch("SELECT * FROM ignoredusers WHERE serverid = $1", message.guild.id)
-        for ignoreduser in ignoredusers:
-            if ignoreduser["userid"] == message.author.id:
-                return
+#         ignoredusers = await bot.db.fetch("SELECT * FROM ignoredusers WHERE serverid = $1", message.guild.id)
+#         for ignoreduser in ignoredusers:
+#             if ignoreduser["userid"] == message.author.id:
+#                 return
 
-        completion = evalu("Things to know:\n- THIS IS VERY IMPORTANT! CONSIDER \"YES\" AS SAFE.\n- If the message mentions they hate a person, consider it as hate.\n- If the message mentions they hate an object, consider it safe.\n- If the message mentions they hate PEOPLE who HATES an object, consider it as hate.\n- If the message has sexual assault towards a person, consider it as harassment.\n- If the message has explicit words, consider it as adult content.\n- If the message is someone screaming (like \"AAAAAAAAAAAAA\"), consider it safe.\n-- (IMPORTANT) If the message has only 1 letter but may complete to an explicit word (like \"d\"), consider it SAFE.\n-- If the message has explicit words, but not too explicit (like \"frick\", \"dang\", etc.), consider it safe.\n- If the message has unrecognized words (like \"bruh\", \"noway\", \"amogus\", \"i forgot\", etc.), consider it safe.\n-- If the message has unrecognized words BUT RESEMBLES A SWEAR (like \"pvvsy\", \"f3ck\", \"sh1t\"), consider it as adult content.\n- If the message has shortened explicit words (like \"fk\", \"btch\", etc.), consider it as adult content.\n- If the message has misspelled mild explicit words (Like \"fricl\", etc.), consider it safe.\n-If the message has random numbers (like \"234739\", \"333822\", etc.), consider it safe.\n-If the message has an unrecognized set of patterns (like \"--case 838374\", \"?ban\", etc.), consider it safe.\n- If the message has someone having problems with their mental health (like \"Im getting insane\", etc.), consider it safe.\n- If the message has emoticons (like \":P\", \":O\", \":)\", \"xD\", \"Xd\", \":-)\", etc.), consider it safe.\n- If the message only has 1 letter, consider it safe.\n- If the message is random characters (like \"dsfhiufhudsafjddi\", \"dksfjsdksksksfksfjdks\", \"epoiwfjoheroe\", etc.), consider it SAFE.\n- If the message is random characters (like \"dsfhiufhudsafjddi\", \"dksfjsdksksksfksfjdks\", \"epoiwfjoheroe\", etc.), consider it SAFE.\n- If the message is literally the word \"hate\",  consider it SAFE.\n- If the message is literally the word \"adult content\",  consider it SAFE.\n- If the message is literally the word \"harassment\",  consider it SAFE.\n\nClassify the following message if it has hate, or adult content, or harassment using the points provided:\n\n\"" + message.content +"\"\n\nResult:", 16)
+#         completion = evalu("Things to know:\n- THIS IS VERY IMPORTANT! CONSIDER \"YES\" AS SAFE.\n- If the message mentions they hate a person, consider it as hate.\n- If the message mentions they hate an object, consider it safe.\n- If the message mentions they hate PEOPLE who HATES an object, consider it as hate.\n- If the message has sexual assault towards a person, consider it as harassment.\n- If the message has explicit words, consider it as adult content.\n- If the message is someone screaming (like \"AAAAAAAAAAAAA\"), consider it safe.\n-- (IMPORTANT) If the message has only 1 letter but may complete to an explicit word (like \"d\"), consider it SAFE.\n-- If the message has explicit words, but not too explicit (like \"frick\", \"dang\", etc.), consider it safe.\n- If the message has unrecognized words (like \"bruh\", \"noway\", \"amogus\", \"i forgot\", etc.), consider it safe.\n-- If the message has unrecognized words BUT RESEMBLES A SWEAR (like \"pvvsy\", \"f3ck\", \"sh1t\"), consider it as adult content.\n- If the message has shortened explicit words (like \"fk\", \"btch\", etc.), consider it as adult content.\n- If the message has misspelled mild explicit words (Like \"fricl\", etc.), consider it safe.\n-If the message has random numbers (like \"234739\", \"333822\", etc.), consider it safe.\n-If the message has an unrecognized set of patterns (like \"--case 838374\", \"?ban\", etc.), consider it safe.\n- If the message has someone having problems with their mental health (like \"Im getting insane\", etc.), consider it safe.\n- If the message has emoticons (like \":P\", \":O\", \":)\", \"xD\", \"Xd\", \":-)\", etc.), consider it safe.\n- If the message only has 1 letter, consider it safe.\n- If the message is random characters (like \"dsfhiufhudsafjddi\", \"dksfjsdksksksfksfjdks\", \"epoiwfjoheroe\", etc.), consider it SAFE.\n- If the message is random characters (like \"dsfhiufhudsafjddi\", \"dksfjsdksksksfksfjdks\", \"epoiwfjoheroe\", etc.), consider it SAFE.\n- If the message is literally the word \"hate\",  consider it SAFE.\n- If the message is literally the word \"adult content\",  consider it SAFE.\n- If the message is literally the word \"harassment\",  consider it SAFE.\n\nClassify the following message if it has hate, or adult content, or harassment using the points provided:\n\n\"" + message.content +"\"\n\nResult:", 16)
 
-        result = completion.choices[0].text.lower()
+#         result = completion.choices[0].text.lower()
 
-        if "none" in result or "not" in result or "no" in result or "safe" in result:
-            return
+#         if "none" in result or "not" in result or "no" in result or "safe" in result:
+#             return
             
-        if "hate" in result:
-            await warning("hate", message, warningchannel)
+#         if "hate" in result:
+#             await warning("hate", message, warningchannel)
 
-        if "adult" in result:
-            await warning("adult", message, warningchannel)
+#         if "adult" in result:
+#             await warning("adult", message, warningchannel)
 
-        if "harassment" in result:
-            await warning("harassment", message, warningchannel)
+#         if "harassment" in result:
+#             await warning("harassment", message, warningchannel)
 
 
 @bot.command()
