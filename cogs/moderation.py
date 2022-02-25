@@ -149,6 +149,7 @@ class Moderation(commands.Cog):
     async def test(self, ctx):
         await ctx.send(ctx.message.content)
         print(ctx.message.content)
+        await ctx.message.add_reaction(ctx.message.content.replace("--test ", ""))
 
     # @commands.command()
     # @commands.has_guild_permissions(manage_messages=True)
