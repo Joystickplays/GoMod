@@ -196,7 +196,7 @@ class Moderation(commands.Cog):
             await ctx.send("That emoji is invalid.", delete_after=3)
             return
 
-        embed = discord.Embed(title="Reaction role setup", description="4/4\nWhat role will be given to the user when they react?", color=0x00b2ff)
+        embed = discord.Embed(title="Reaction role setup", description="4/4\nWhat role will be given to the user when they react? (Do NOT mention the role. Instead, use the name.", color=0x00b2ff)
         msg = await ctx.send(embed=embed)
 
         try:
