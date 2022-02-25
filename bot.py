@@ -373,42 +373,6 @@ async def sqlquery(ctx, *, query):
 
 
 @bot.command()
-@commands.cooldown(1, 1800)
-@commands.has_permissions(manage_messages=True)
-async def rulemaker(ctx):
-    embed = discord.Embed(title="Rulemaker setup", description="Rulemaker helps you create rules using AI, so any rules you get is NOT predefined. The rules is set based on what your community does.\n\nLet's start: What is your community about? (We recommend 1 to 2 words.)", color=0x00b2ff)
-    init = await ctx.send(embed=embed)
-    def check(m):
-        return m.author == ctx.author and m.channel == ctx.channel
-    
-    try:
-        msg = await bot.wait_for('message', check=check, timeout=60)
-    except asyncio.TimeoutError:
-        await init.edit("Timed out.", delete_after=3)
-        await bot.get_command('rulemaker').reset_cooldown(ctx) 
-        return
-
-    if len(msg.content) > 50:
-        await init.edit("You can't input 50 or more characters.", delete_after=3)
-        await bot.get_command('rulemaker').reset_cooldown(ctx)
-        return
-
-    embed = discord.Embed(title="Rulemaker setup", description="We're creating the set of rules now...", color=0x00b2ff)
-    setrules = await ctx.send(embed=embed)
-
-    completion = evalu("Create 10 rules for a digital community that is about: " + msg.content + "\n\n1.", 80)
-
-    result = completion.choices[0].text
-    embed = discord.Embed(title="Rulemaker setup", description="Complete! Review the following set of rules. \n\n1." + result + "\n\nDon't like how it turned out? You can re-run this command. **Please do know that this command has a 30 minute cooldown to prevent abuse.**", color=0x00b2ff)
-    await setrules.edit(embed=embed)
-
-@rulemaker.error
-async def rulemaker_error(ctx, error):
-    if isinstance(error, commands.CommandOnCooldown):
-        embed = discord.Embed(title="Rulemaker setup", description=f"You are on cooldown. Please try again in {round(error.retry_after / 60)} minutes.", color=0x00b2ff)
-        await ctx.send(embed=embed)
-
-@bot.command()
 @commands.has_permissions(manage_messages=True)
 async def vote(ctx):
     embed = discord.Embed(title="Vote", description="Vote for the bot here: https://top.gg/bot/940038014153949254/vote", color=0x00b2ff)
