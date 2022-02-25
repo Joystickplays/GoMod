@@ -13,7 +13,9 @@ class Moderation(commands.Cog):
         if lookup:
             if reaction.emoji.id == lookup['reaction']:
                 role = discord.utils.get(user.guild.roles, id=lookup['role'])
+                print(lookup["role"])
                 if role == None:
+                    print("retruned none :(")
                     return
 
                 if role in user.roles:
