@@ -177,7 +177,7 @@ class Moderation(commands.Cog):
             await ctx.send("That channel doesn't exist.", delete_after=3)
             return
         
-        embed = discord.Embed(title="Reaction role setup", description="2/4\nWhat is your message's ID? More on getting message IDs [here](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)", color=0x00b2ff)
+        embed = discord.Embed(title="Reaction role setup", description="2/4\nWhat is your message's ID? More on getting message IDs [here](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-). You can also say \"create one\" to make GoMod create a message for you.", color=0x00b2ff)
         msg = await ctx.send(embed=embed)
 
         try:
@@ -186,11 +186,35 @@ class Moderation(commands.Cog):
             await ctx.send("Timed out.", delete_after=3)
             return
 
-        try:
-            message = await channel.fetch_message(int(msg.content))
-        except:
-            await ctx.send("That message doesn't exist.", delete_after=3)
-            return
+        if msg.content.lower() == "create one":
+            embed = discord.Embed(title="Reaction role setup", description="3.5/4\nWhat will be the title of the message?", color=0x00b2ff)
+            msg = await ctx.send(embed=embed)
+
+            try:
+                title = await self.bot.wait_for('message', check=check, timeout=60)
+            except asyncio.TimeoutError:
+                await ctx.send("Timed out.", delete_after=3)
+                return
+            
+            embed = discord.Embed(title="Reaction role setup", description="3.5/4\nWhat will be the description of the message?", color=0x00b2ff)
+            msg = await ctx.send(embed=embed)
+
+            try:
+                description = await self.bot.wait_for('message', check=check, timeout=60)
+            except asyncio.TimeoutError:
+                await ctx.send("Timed out.", delete_after=3)
+                return
+
+            embed = discord.Embed(title=title.content, description=description.content, color=0x00b2ff)
+            message = await ctx.send(embed=embed)
+
+            
+        if message == None:
+            try:
+                message = await channel.fetch_message(int(msg.content))
+            except:
+                await ctx.send("That message doesn't exist.", delete_after=3)
+                return
 
         embed = discord.Embed(title="Reaction role setup", description="3/4\nWhat will be the emoji for your reaction?", color=0x00b2ff)
         msg = await ctx.send(embed=embed)
