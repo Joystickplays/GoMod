@@ -24,11 +24,12 @@ class Moderation(commands.Cog):
     
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
-        lookup = await self.bot.db.fetchrow("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
+        lookup = await self.bot.db.fetch("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
         if lookup:
             if user == reaction.message.guild.me:
                 print("reaction removed")
                 await self.bot.db.execute("DELETE FROM reactroles WHERE message = $1 AND channel = $2 AND reaction = $3", reaction.message.id, reaction.message.channel.id, reaction.emoji)
+                return
 
             for entry in lookup:
                 if reaction.emoji == entry['reaction']:
