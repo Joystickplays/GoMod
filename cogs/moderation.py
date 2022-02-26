@@ -60,7 +60,7 @@ class Moderation(commands.Cog):
         class MyView(discord.ui.View):
             @discord.ui.button(label="Tell GoMod your name.", style=discord.ButtonStyle.primary)
             async def button_callback(self, button, interaction):
-                modal = Modal(title="Modal Triggered from Button")
+                modal = Modal(title="Greetings.")
                 await interaction.response.send_modal(modal)
 
         view = MyView()
