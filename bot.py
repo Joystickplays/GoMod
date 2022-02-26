@@ -100,7 +100,8 @@ cogs = [
     "cogs.moderation",
     "cogs.aimod",
     "cogs.tags",
-    "cogs.logging"
+    "cogs.logging",
+    "cogs.ticketmanagement"
 ]
 
 for cog in cogs:
@@ -295,6 +296,7 @@ async def help(ctx):
             embed.add_field(name="--block <member>", value="Blocks a member from the channel this command is run in.", inline=False)
             embed.add_field(name="--unblock <member>", value="Unblocks a member from the channel this command is run in.", inline=False)
             embed.add_field(name="--reactrole", value="Run a reaction role setup.", inline=False)
+            embed.add_field(name="--ticketsetup", value="Run a ticket management setup.", inline=False)
 
         if chosen == "o":
             viewthing.other.disabled = True
