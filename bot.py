@@ -294,6 +294,7 @@ async def help(ctx):
             # embed.add_field(name="--unmute <member> [reason]", value="Unmutes a member and if specified, with a reason.", inline=False)
             embed.add_field(name="--block <member>", value="Blocks a member from the channel this command is run in.", inline=False)
             embed.add_field(name="--unblock <member>", value="Unblocks a member from the channel this command is run in.", inline=False)
+            embed.add_field(name="--reactrole", value="Run a reaction role setup.", inline=False)
 
         if chosen == "o":
             viewthing.other.disabled = True
