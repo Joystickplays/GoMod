@@ -55,16 +55,16 @@ class Moderation(commands.Cog):
             await self.bot.db.execute("DELETE FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
     
 
-    @commands.command()
-    async def modaltest(self, ctx):
-        class MyView(discord.ui.View):
-            @discord.ui.button(label="Tell GoMod your name.", style=discord.ButtonStyle.primary)
-            async def button_callback(self, button, interaction):
-                modal = Modal(title="Greetings.")
-                await interaction.response.send_modal(modal)
+    # @commands.command()
+    # async def modaltest(self, ctx):
+    #     class MyView(discord.ui.View):
+    #         @discord.ui.button(label="Tell GoMod your name.", style=discord.ButtonStyle.primary)
+    #         async def button_callback(self, button, interaction):
+    #             modal = Modal(title="Greetings.")
+    #             await interaction.response.send_modal(modal)
 
-        view = MyView()
-        await ctx.send("Hello! I am GoMod.", view=view)
+    #     view = MyView()
+    #     await ctx.send("Hello! I am GoMod.", view=view)
 
     @commands.command()
     @commands.has_guild_permissions(kick_members=True)
