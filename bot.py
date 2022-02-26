@@ -78,6 +78,7 @@ activity = discord.Activity(name='for rulebreakers', type=discord.ActivityType.w
 intents = discord.Intents.default()
 intents.members = True
 intents.guilds = True
+intents.reactions = True
 class GoModBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
