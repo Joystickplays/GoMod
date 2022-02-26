@@ -14,7 +14,7 @@ class Moderation(commands.Cog):
         print(lookup)
         if lookup:
             print("lookup ok")
-            if reaction.emoji.id == lookup['reaction']:
+            if reaction.emoji == lookup['reaction']:
                 role = discord.utils.get(user.guild.roles, id=lookup['role'])
                 print(lookup["role"])
                 if role == None:
