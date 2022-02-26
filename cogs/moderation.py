@@ -9,23 +9,29 @@ class Moderation(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        print("reaction added")
         lookup = await self.bot.db.fetchrow("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
-        print(lookup)
         if lookup:
-            print("lookup ok")
             if reaction.emoji == lookup['reaction']:
                 role = discord.utils.get(user.guild.roles, id=lookup['role'])
-                print(lookup["role"])
                 if role == None:
-                    print("retruned none :(")
                     return
 
                 if role in user.roles:
                     pass
                 else:
                     await user.add_roles(role)
-                    print("added successfully")
+    
+    @commands.Cog.listener()
+    async def on_reaction_remove(self, reaction, user):
+        lookup = await self.bot.db.fetchrow("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
+        if lookup:
+            if reaction.emoji == lookup['reaction']:
+                role = discord.utils.get(user.guild.roles, id=lookup['role'])
+                if role == None:
+                    return
+
+                if role in user.roles:
+                    await user.remove_roles(role)
 
     @commands.command()
     @commands.has_guild_permissions(kick_members=True)
