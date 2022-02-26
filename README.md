@@ -1,4 +1,4 @@
-[![Discord Bots](https://top.gg/api/widget/servers/940038014153949254.svg)
+![Discord Bots](https://top.gg/api/widget/servers/940038014153949254.svg)
 
 # GoMod
 
