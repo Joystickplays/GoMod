@@ -172,7 +172,10 @@ class Moderation(commands.Cog):
             await ctx.send("Timed out.", delete_after=3)
             return
 
-        channel = discord.utils.get(ctx.guild.text_channels, name=msg.content)
+
+        channelcheck = msg.content.replace(" ", "-")
+        channelcheck2 = channelcheck.lower()
+        channel = discord.utils.get(ctx.guild.text_channels, name=channelcheck2)
         if channel == None:
             await ctx.send("That channel doesn't exist.", delete_after=3)
             return
@@ -206,7 +209,7 @@ class Moderation(commands.Cog):
                 return
 
             embed = discord.Embed(title=title.content, description=description.content, color=0x00b2ff)
-            message = await ctx.send(embed=embed)
+            message = await channel.send(embed=embed)
 
             
         if message == None:
