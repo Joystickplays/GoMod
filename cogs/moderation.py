@@ -2,6 +2,15 @@ import discord
 from discord.ext import commands
 import asyncio
 from bot import GoModBot
+from discord.ui import InputText, Modal
+
+class Modal(Modal):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_item(InputText(label="What is your name?", placeholder="John Doe"))
+
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.send_message(f"Hello, {self.children[0].value}!")
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -45,6 +54,17 @@ class Moderation(commands.Cog):
         if lookup:
             await self.bot.db.execute("DELETE FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
     
+
+    @commands.command()
+    async def modaltest(self, ctx):
+        class MyView(discord.ui.View):
+            @discord.ui.button(label="Tell GoMod your name.", style=discord.ButtonStyle.primary)
+            async def button_callback(self, button, interaction):
+                modal = Modal(title="Modal Triggered from Button")
+                await interaction.response.send_modal(modal)
+
+        view = MyView()
+        await ctx.send("Hello! I am GoMod.", view=view)
 
     @commands.command()
     @commands.has_guild_permissions(kick_members=True)
