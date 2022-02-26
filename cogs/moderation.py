@@ -189,6 +189,8 @@ class Moderation(commands.Cog):
             await ctx.send("Timed out.", delete_after=3)
             return
 
+        message = None
+
         if msg.content.lower() == "create one":
             embed = discord.Embed(title="Reaction role setup", description="3.5/4\nWhat will be the title of the message?", color=0x00b2ff)
             msg = await ctx.send(embed=embed)
