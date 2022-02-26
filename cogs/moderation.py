@@ -27,7 +27,6 @@ class Moderation(commands.Cog):
         lookup = await self.bot.db.fetch("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
         if lookup:
             if user == reaction.message.guild.me:
-                print("reaction removed")
                 await self.bot.db.execute("DELETE FROM reactroles WHERE message = $1 AND channel = $2 AND reaction = $3", reaction.message.id, reaction.message.channel.id, reaction.emoji)
                 return
 
@@ -44,7 +43,6 @@ class Moderation(commands.Cog):
     async def on_message_delete(self, message):
         lookup = await self.bot.db.fetchrow("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
         if lookup:
-            print("message deleted")
             await self.bot.db.execute("DELETE FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
     
 
