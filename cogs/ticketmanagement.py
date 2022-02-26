@@ -23,7 +23,7 @@ class Tickets(commands.Cog):
             def __init__(self):
                 options = []
                 for channel in ctx.guild.text_channels:
-                    options.append(label=channel.name, description=f"Use {channel.name} as an entry.")
+                    options.append(discord.SelectOption(label=channel.name, description=f"Use {channel.name} as an entry."))
 
                 super().__init__(
                     placeholder="Choose a channel.",
