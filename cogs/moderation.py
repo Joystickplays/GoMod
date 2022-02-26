@@ -26,13 +26,26 @@ class Moderation(commands.Cog):
     async def on_reaction_remove(self, reaction, user):
         lookup = await self.bot.db.fetchrow("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
         if lookup:
-            if reaction.emoji == lookup['reaction']:
-                role = discord.utils.get(user.guild.roles, id=lookup['role'])
-                if role == None:
-                    return
+            if user == reaction.message.guild.me:
+                print("reaction removed")
+                await self.bot.db.execute("DELETE FROM reactroles WHERE message = $1 AND channel = $2 AND reaction = $3", reaction.message.id, reaction.message.channel.id, reaction.emoji)
 
-                if role in user.roles:
-                    await user.remove_roles(role)
+            for entry in lookup:
+                if reaction.emoji == entry['reaction']:
+                    role = discord.utils.get(user.guild.roles, id=entry['role'])
+                    if role == None:
+                        return
+
+                    if role in user.roles:
+                        await user.remove_roles(role)
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
+        lookup = await self.bot.db.fetchrow("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
+        if lookup:
+            print("message deleted")
+            await self.bot.db.execute("DELETE FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
+    
 
     @commands.command()
     @commands.has_guild_permissions(kick_members=True)
