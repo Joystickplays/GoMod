@@ -246,10 +246,11 @@ async def unloadcog(ctx, cog):
 @commands.is_owner()
 async def reloadallcogs(ctx):
     cogs = [
-    "cogs.moderation",
-    "cogs.aimod",
-    "cogs.tags",
-    "cogs.logging"
+        "cogs.moderation",
+        "cogs.aimod",
+        "cogs.tags",
+        "cogs.logging",
+        "cogs.ticketmanagement"
     ]
     for cog in cogs:
         try:

@@ -33,6 +33,7 @@ class Tickets(commands.Cog):
                 )
 
             async def callback(self, interaction: discord.Interaction):
+                print(self.values[0])
                 self.channelpicked = self.values[0]
 
 
@@ -43,6 +44,7 @@ class Tickets(commands.Cog):
                 self.add_item(ChannelSelection())
 
             async def callback(self, interaction: discord.Interaction):
+                print("1")
                 self.value = self.children[0].channelpicked
                 self.stop()
 
