@@ -1,3 +1,5 @@
+![Discord Bots](https://top.gg/api/widget/servers/940038014153949254.svg)
+
 # GoMod
 
 GoMod is a moderator bot that's aiming to make moderation easy for everyone.
