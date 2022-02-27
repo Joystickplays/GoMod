@@ -51,7 +51,7 @@ class ModRep(commands.Cog):
         votes = await self.bot.db.fetch("SELECT COUNT(*) FROM repvotes WHERE who = $1", member.id)
         votes = votes[0]["count"]
         embed = discord.Embed(title="Reputation", description=f"{member.mention} has {votes} votes.", color=0x00b2ff)
-        await ctx.send(embed=embed, view=UpDownvote(self.bot))
+        await ctx.send(embed=embed, view=UpDownvote(self.bot, member))
 
 def setup(bot:GoModBot):
     bot.add_cog(ModRep(bot))
