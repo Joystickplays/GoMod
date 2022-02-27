@@ -34,6 +34,7 @@ class CreateTicket(discord.ui.View):
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
+        lookup = await self.bot.db.fetchrow("SELECT * FROM ticketconfigs WHERE guild = $1", interaction.message.guild.id)
         if lookup["needreason"] == "t":
             modal = Modal(title="Create ticket")
         else:
