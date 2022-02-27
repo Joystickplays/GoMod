@@ -20,7 +20,7 @@ class CreateTicket(discord.ui.View):
 
     @discord.ui.button(label='Create ticket', style=discord.ButtonStyle.green, custom_id="gomod:create_ticket")
     async def create(self, button: discord.ui.Button, interaction: discord.Interaction):
-        lookup = await self.bot.db.fetchrow("SELECT * FROM tickets WHERE userid = $1 AND server = $2", self.author.id, interaction.message.guild)
+        lookup = await self.bot.db.fetchrow("SELECT * FROM tickets WHERE userid = $1 AND server = $2", interaction.user.id, interaction.message.guild.id)
         if lookup != None:
             embed = discord.Embed(title="Ticket", description=f"You already have a ticket open.", color=0x00b2ff)
             await interaction.response.send_message(embed=embed, ephemeral=True)
