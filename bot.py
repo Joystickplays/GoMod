@@ -15,7 +15,6 @@ import random
 import traceback
 import sys
 import json
-from cogs.ticketmanagement import CreateTicket
 
 from dotenv import load_dotenv
 
@@ -87,9 +86,9 @@ class GoModBot(commands.Bot):
     async def on_ready(self):
         print("Ready")
 
-        if not self.ticket_views_added:
-            self.add_view(CreateTicket())
-            self.ticket_views_added = True
+        # if not self.ticket_views_added:
+        #     self.add_view(CreateTicket())
+        #     self.ticket_views_added = True
 
         logs = await self.bot.db.fetch("SELECT * FROM logch")
         for log in logs:
