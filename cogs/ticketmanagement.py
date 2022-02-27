@@ -10,7 +10,15 @@ class Modal(Modal):
         self.add_item(InputText(label="Give a reason for your ticket.", placeholder="I am creating this ticket because..."))
 
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f"Hello, {self.children[0].value}!")
+        CreateTicket(self, interaction.message.guild, self.children[0].value, interaction.user)
+
+class NotRequiredModal(Modal):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_item(InputText(label="Give a reason for your ticket.", placeholder="I am creating this ticket because..."), required=False)
+
+    async def callback(self, interaction: discord.Interaction):
+        CreateTicket(self, interaction.message.guild, self.children[0].value, interaction.user)
 
 class CreateTicket(discord.ui.View):
     def __init__(self, bot): 
@@ -20,16 +28,30 @@ class CreateTicket(discord.ui.View):
 
     @discord.ui.button(label='Create ticket', style=discord.ButtonStyle.green, custom_id="gomod:create_ticket")
     async def create(self, button: discord.ui.Button, interaction: discord.Interaction):
-        lookup = await self.bot.db.fetchrow("SELECT * FROM tickets WHERE userid = $1 AND server = $2", interaction.user.id, interaction.message.guild.id)
+        lookup = await self.bot.db.fetchrow("SELECT * FROM tickets WHERE userid = $1 AND guild = $2", interaction.user.id, interaction.message.guild.id)
         if lookup != None:
             embed = discord.Embed(title="Ticket", description=f"You already have a ticket open.", color=0x00b2ff)
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return
-        modal = Modal(title="Create ticket")
+        modal = Modal(title="Create ticket") if lookup["needreason"] else NotRequiredModal(title="Create ticket")
         await interaction.response.send_modal(modal)
 
-async def createticket(self, guild, reason):
-    pass
+async def createticket(self, guild, reason, user):
+    guildconfig = await self.bot.db.fetchrow("SELECT * FROM ticketconfigs WHERE guild = $1", guild.id)
+    if guildconfig is None:
+        return
+    
+    try:
+        category = self.bot.get_channel(guildconfig["category"])
+    except:
+        return
+
+    embed = discord.Embed(title="Ticket", description=f"{user.mention}, has made a ticket with {reason}.\n\nPlease wait for a staff member to respond.", color=0x00b2ff)
+    embed.set_footer(text=f"Ticket ID: {user.id}")
+
+    channel = await guild.create_text_channel(f"ticket-{user.id}", category=category, topic=reason, reason="Creating ticket")
+    await channel.send(embed=embed)
+
 
     
 
