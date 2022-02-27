@@ -131,7 +131,7 @@ class Tickets(commands.Cog):
 
             @discord.ui.button(label='Yes', style=discord.ButtonStyle.red)
             async def yes(self, button: discord.ui.Button, interaction: discord.Interaction):
-                if interaction.message.author != self.ctx.author:
+                if interaction.user != self.ctx.author:
                     return
 
                 lookup = await self.bot.db.fetchrow("SELECT * FROM ticketconfigs WHERE guild = $1", ctx.guild.id)
