@@ -13,11 +13,10 @@ class Modal(Modal):
         await interaction.response.send_message(f"Hello, {self.children[0].value}!")
 
 class CreateTicket(discord.ui.View):
-    def __init__(self, ctx): 
+    def __init__(self, bot): 
         super().__init__(timeout=None)
         self.value = None
-        self.ctx = ctx
-        self.bot = self.bot
+        self.bot = bot
 
     @discord.ui.button(label='Create ticket', style=discord.ButtonStyle.green, custom_id="gomod:create_ticket")
     async def create(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -34,21 +33,21 @@ async def createticket(self, guild, reason):
 
     
 
-async def ticket(channel):
+async def ticket(self, channel):
     embed = discord.Embed(title="Create a ticket", description="Create a ticket by clicking the button below.")
-    await channel.send(embed=embed, view=CreateTicket())
+    await channel.send(embed=embed, view=CreateTicket(self.bot))
 
 
 class Tickets(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group()
+    @commands.command()
     @commands.has_guild_permissions(manage_guild=True, manage_messages=True)
     async def ticketsetup(self, ctx):
         lookup = await self.bot.db.fetchrow("SELECT * FROM ticketconfigs WHERE guild = $1", ctx.guild.id)
         if lookup:
-            await ctx.send("Ticketing is already setup. To remove it, use `--ticketsetup remove`.")
+            await ctx.send("Ticketing is already setup. To remove it, use `--ticketremove.")
             return
 
         embed = discord.Embed(title="Ticket Setup", description="Welcome to the ticket setup.\n\nSay \"cancel\" at any point to stop setup. Let's start with something simple.\n\nWhich channel can the users make their ticket?\n(Do NOT mention the channel. Instead, use their name.)", color=0x00b2ff)
@@ -119,9 +118,9 @@ class Tickets(commands.Cog):
         await ticket(channel)
         await ctx.send("Setup complete! Your members now may create tickets.")
 
-    @ticketsetup.command()
+    @commands.command()
     @commands.has_guild_permissions(manage_guild=True, manage_messages=True)
-    async def remove(self, ctx):
+    async def ticketremove(self, ctx):
         class AreYouSure(discord.ui.View):
             def __init__(self, ctx, bot):
                 super().__init__()
