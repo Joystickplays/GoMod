@@ -33,7 +33,11 @@ class CreateTicket(discord.ui.View):
             embed = discord.Embed(title="Ticket", description=f"You already have a ticket open.", color=0x00b2ff)
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return
-        modal = Modal(title="Create ticket") if lookup["needreason"] else NotRequiredModal(title="Create ticket")
+
+        if lookup["needreason"] == "t":
+            modal = Modal(title="Create ticket")
+        else:
+            modal = NotRequiredModal(title="Create ticket")
         await interaction.response.send_modal(modal)
 
 async def createticket(self, guild, reason, user):
