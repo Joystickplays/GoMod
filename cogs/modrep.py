@@ -28,17 +28,17 @@ class UpDownvote(discord.ui.View):
             if lookup["type"] == "down":
                 await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'down'", self.mem.id, interaction.user.id)
                 await self.bot.db.execute("INSERT INTO repvotes (who, voted, type) VALUES ($1, $2, 'up')", self.mem.id, interaction.user.id)
-                embed = await getvotes(self.mem)
+                embed = await getvotes(self, self.mem)
                 await interaction.message.edit(content=f"Update: {interaction.user.mention} cancelled the downvote and upvote this member.", embed=embed)
                 return
             elif lookup["type"] == "up":
                 await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'up'", self.mem.id, interaction.user.id)
-                embed = await getvotes(self.mem)
+                embed = await getvotes(self, self.mem)
                 await interaction.message.edit(f"Update: {interaction.user.mention} cancelled the upvote for this user.", embed=embed)
                 return
 
         await self.bot.db.execute("INSERT INTO repvotes (who, voted, type) VALUES ($1, $2, 'up')", self.mem.id, interaction.user.id)
-        embed = await getvotes(self.mem)
+        embed = await getvotes(self, self.mem)
         await interaction.message.edit(content=f"Update: {interaction.user.mention} upvoted this member.", embed=embed)
 
     @discord.ui.button(label='Downvote', style=discord.ButtonStyle.red)
@@ -51,18 +51,18 @@ class UpDownvote(discord.ui.View):
         if lookup:
             if lookup["type"] == "down":
                 await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'down'", self.mem.id, interaction.user.id)
-                embed = await getvotes(self.mem)
+                embed = await getvotes(self, self.mem)
                 await interaction.message.edit(f"Update: {interaction.user.mention} cancelled the downvote for this user.", embed=embed)
                 return
             elif lookup["type"] == "up":
                 await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'up'", self.mem.id, interaction.user.id)
                 await self.bot.db.execute("INSERT INTO repvotes (who, voted, type) VALUES ($1, $2, 'down')", self.mem.id, interaction.user.id)
-                embed = await getvotes(self.mem)
+                embed = await getvotes(self, self.mem)
                 await interaction.message.edit(content=f"Update: {interaction.user.mention} cancelled the upvote and downvoted this member.", embed=embed)
                 return
 
         await self.bot.db.execute("INSERT INTO repvotes (who, voted, type) VALUES ($1, $2, 'down')", self.mem.id, interaction.user.id)
-        embed = await getvotes(self.mem)
+        embed = await getvotes(self, self.mem)
         await interaction.message.edit(content=f"Update: {interaction.user.mention} downvoted this member.", embed=embed)
 
 
@@ -72,7 +72,7 @@ class ModRep(commands.Cog):
 
     @commands.command()
     async def modrep(self, ctx, member: discord.Member):
-        embed = await getvotes(member)
+        embed = await getvotes(self, member)
         await ctx.send(embed=embed, view=UpDownvote(self.bot, member))
 
 def setup(bot:GoModBot):
