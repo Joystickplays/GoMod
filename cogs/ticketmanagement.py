@@ -115,7 +115,7 @@ class Tickets(commands.Cog):
                 return
 
         await self.bot.db.execute("INSERT INTO ticketconfigs (guild, channel, needreason, category) VALUES ($1, $2, $3, $4)", ctx.guild.id, channel.id, needreason, category.id)
-        await ticket(channel)
+        await ticket(self, channel)
         await ctx.send("Setup complete! Your members now may create tickets.")
 
     @commands.command()
