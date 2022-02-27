@@ -45,89 +45,89 @@ class Tickets(commands.Cog):
 
     @commands.group()
     @commands.has_guild_permissions(manage_guild=True, manage_messages=True)
-    async def ticketsetup(self, ctx, subcommand=None):
-        if subcommand == None:
-            lookup = await self.bot.db.fetchrow("SELECT * FROM ticketconfigs WHERE guild = $1", ctx.guild.id)
-            if lookup:
-                await ctx.send("Ticketing is already setup. To remove it, use `--ticketsetup remove`.")
+    async def ticketsetup(self, ctx):
+        lookup = await self.bot.db.fetchrow("SELECT * FROM ticketconfigs WHERE guild = $1", ctx.guild.id)
+        if lookup:
+            await ctx.send("Ticketing is already setup. To remove it, use `--ticketsetup remove`.")
+            return
+
+        embed = discord.Embed(title="Ticket Setup", description="Welcome to the ticket setup.\n\nSay \"cancel\" at any point to stop setup. Let's start with something simple.\n\nWhich channel can the users make their ticket?\n(Do NOT mention the channel. Instead, use their name.)", color=0x00b2ff)
+        await ctx.send(embed=embed)
+
+        def check(m):
+            return m.author == ctx.author and m.channel == ctx.channel
+        
+        try:
+            msg = await self.bot.wait_for('message', check=check, timeout=60)
+        except asyncio.TimeoutError:
+            await ctx.send("You took too long. Cancelling the setup.")
+            return
+
+        if msg.content.lower() == "cancel":
+            await ctx.send("Cancelling the setup.")
+            return
+
+        channel = None
+        while channel == None:
+            channelcheck = msg.content.replace(" ", "-")
+            channelcheck2 = channelcheck.lower()
+            channel = discord.utils.get(ctx.guild.text_channels, name=channelcheck2)
+            if channel == None:
+                await ctx.send("That channel doesn't exist. Try again...", delete_after=3)
                 return
 
-            embed = discord.Embed(title="Ticket Setup", description="Welcome to the ticket setup.\n\nSay \"cancel\" at any point to stop setup. Let's start with something simple.\n\nWhich channel can the users make their ticket?\n(Do NOT mention the channel. Instead, use their name.)", color=0x00b2ff)
-            await ctx.send(embed=embed)
+        embed = discord.Embed(title="Ticket Setup", description="Great! Now, will a reason for every ticket needed? (y/yes, n/no)", color=0x00b2ff)
+        await ctx.send(embed=embed)
 
-            def check(m):
-                return m.author == ctx.author and m.channel == ctx.channel
-            
-            try:
-                msg = await self.bot.wait_for('message', check=check, timeout=60)
-            except asyncio.TimeoutError:
-                await ctx.send("You took too long. Cancelling the setup.")
+        try:
+            msg = await self.bot.wait_for('message', check=check, timeout=60)
+        except asyncio.TimeoutError:
+            await ctx.send("You took too long. Cancelling the setup.")
+            return
+
+        if msg.content.lower() == "cancel":
+            await ctx.send("Cancelling the setup.")
+            return
+
+        if msg.content.lower() == "y" or msg.content.lower() == "yes":
+            needreason = True
+
+        if msg.content.lower() == "n" or msg.content.lower() == "no":
+            needreason = False
+
+        embed = discord.Embed(title="Ticket Setup", description="Looking good! Last but not least, we need a place for the tickets. \n\nEnter a category name where the tickets should be. \n(Do NOT use a category that's not private. Otherwise, other people will message inside the tickets.", color=0x00b2ff)
+        await ctx.send(embed=embed)
+
+        try:
+            msg = await self.bot.wait_for('message', check=check, timeout=60)
+        except asyncio.TimeoutError:
+            await ctx.send("You took too long. Cancelling the setup.")
+            return
+
+        if msg.content.lower() == "cancel":
+            await ctx.send("Cancelling the setup.")
+            return
+
+        category = None
+        while category == None:
+            category = discord.utils.get(ctx.guild.categories, name=msg.content)
+            if category == None:
+                await ctx.send("That category doesn't exist (Look for upper/lowercase mistakes). Try again...", delete_after=3)
                 return
 
-            if msg.content.lower() == "cancel":
-                await ctx.send("Cancelling the setup.")
-                return
-
-            channel = None
-            while channel == None:
-                channelcheck = msg.content.replace(" ", "-")
-                channelcheck2 = channelcheck.lower()
-                channel = discord.utils.get(ctx.guild.text_channels, name=channelcheck2)
-                if channel == None:
-                    await ctx.send("That channel doesn't exist. Try again...", delete_after=3)
-                    return
-
-            embed = discord.Embed(title="Ticket Setup", description="Great! Now, will a reason for every ticket needed? (y/yes, n/no)", color=0x00b2ff)
-            await ctx.send(embed=embed)
-
-            try:
-                msg = await self.bot.wait_for('message', check=check, timeout=60)
-            except asyncio.TimeoutError:
-                await ctx.send("You took too long. Cancelling the setup.")
-                return
-
-            if msg.content.lower() == "cancel":
-                await ctx.send("Cancelling the setup.")
-                return
-
-            if msg.content.lower() == "y" or msg.content.lower() == "yes":
-                needreason = True
-
-            if msg.content.lower() == "n" or msg.content.lower() == "no":
-                needreason = False
-
-            embed = discord.Embed(title="Ticket Setup", description="Looking good! Last but not least, we need a place for the tickets. \n\nEnter a category name where the tickets should be. \n(Do NOT use a category that's not private. Otherwise, other people will message inside the tickets.", color=0x00b2ff)
-            await ctx.send(embed=embed)
-
-            try:
-                msg = await self.bot.wait_for('message', check=check, timeout=60)
-            except asyncio.TimeoutError:
-                await ctx.send("You took too long. Cancelling the setup.")
-                return
-
-            if msg.content.lower() == "cancel":
-                await ctx.send("Cancelling the setup.")
-                return
-
-            category = None
-            while category == None:
-                category = discord.utils.get(ctx.guild.categories, name=msg.content)
-                if category == None:
-                    await ctx.send("That category doesn't exist (Look for upper/lowercase mistakes). Try again...", delete_after=3)
-                    return
-
-            await self.bot.db.execute("INSERT INTO ticketconfigs (guild, channel, needreason, category) VALUES ($1, $2, $3, $4)", ctx.guild.id, channel.id, needreason, category.id)
-            await ticket(channel)
-            await ctx.send("Setup complete! Your members now may create tickets.")
+        await self.bot.db.execute("INSERT INTO ticketconfigs (guild, channel, needreason, category) VALUES ($1, $2, $3, $4)", ctx.guild.id, channel.id, needreason, category.id)
+        await ticket(channel)
+        await ctx.send("Setup complete! Your members now may create tickets.")
 
     @ticketsetup.command()
     @commands.has_guild_permissions(manage_guild=True, manage_messages=True)
     async def remove(self, ctx):
         class AreYouSure(discord.ui.View):
-            def __init__(self, ctx):
+            def __init__(self, ctx, bot):
                 super().__init__()
                 self.value = None
                 self.ctx = ctx
+                self.bot = bot
 
             @discord.ui.button(label='Yes', style=discord.ButtonStyle.red)
             async def yes(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -143,7 +143,7 @@ class Tickets(commands.Cog):
             async def no(self, button: discord.ui.Button, interaction: discord.Interaction):
                 await interaction.response.send_message("Cancelling the setup.")
 
-        await ctx.send("Are you sure you want to remove ticketing in your server?", view=AreYouSure(ctx))
+        await ctx.send("Are you sure you want to remove ticketing in your server?", view=AreYouSure(ctx, self.bot))
 
 
 def setup(bot:GoModBot):
