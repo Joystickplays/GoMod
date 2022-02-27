@@ -81,23 +81,6 @@ intents.reactions = True
 class GoModBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ticket_views_added = False
-    
-    async def on_ready(self):
-        print("Ready")
-
-        # if not self.ticket_views_added:
-        #     self.add_view(CreateTicket())
-        #     self.ticket_views_added = True
-
-        logs = await self.bot.db.fetch("SELECT * FROM logch")
-        for log in logs:
-            tempdict = {}
-            tempdict["guildid"] = log["guildid"]
-            tempdict["channelid"] = log["channelid"]
-            tempdict["loggingtype"] = log["loggingtype"]
-            bot.logcache.append(tempdict)
-        print("Log channels cache locked and loaded B)")
 
 bot = GoModBot(command_prefix=commands.when_mentioned_or("--" if os.environ.get("BOT_ENV") == "production" else "->"), activity=activity, intents=intents)
 bot.remove_command("help")
@@ -123,6 +106,23 @@ cogs = [
 
 for cog in cogs:
     bot.load_extension(cog)
+
+@bot.event
+async def on_ready():
+    print("Ready")
+
+    # if not self.ticket_views_added:
+    #     self.add_view(CreateTicket())
+    #     self.ticket_views_added = True
+
+    logs = await bot.db.fetch("SELECT * FROM logch")
+    for log in logs:
+        tempdict = {}
+        tempdict["guildid"] = log["guildid"]
+        tempdict["channelid"] = log["channelid"]
+        tempdict["loggingtype"] = log["loggingtype"]
+        bot.logcache.append(tempdict)
+    print("Log channels cache locked and loaded B)")
 
 @bot.event
 async def on_command_error(ctx, error):
