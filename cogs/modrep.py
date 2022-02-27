@@ -17,11 +17,17 @@ class UpDownvote(discord.ui.View):
             await interaction.response.send_message("You cannot upvote or downvote yourself.", ephemeral=True)
             return
 
-        lookup = await self.bot.db.fetchrow("SELECT * FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'up'", self.mem.id, interaction.user.id)
+        lookup = await self.bot.db.fetchrow("SELECT * FROM repvotes WHERE who = $1 AND voted = $2", self.mem.id, interaction.user.id)
         if lookup:
-            await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'up'", self.mem.id, interaction.user.id)
-            await interaction.response.send_message(f"{interaction.user.mention} cancelled the upvote for this user.")
-            return
+            if lookup["type"] == "down":
+                await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'down'", self.mem.id, interaction.user.id)
+                await self.bot.db.execute("INSERT INTO repvotes (who, voted, type) VALUES ($1, $2, 'up')", self.mem.id, interaction.user.id)
+                await interaction.response.send_message(content=f"{interaction.user.mention} cancelled the downvote and upvote this member.")
+                return
+            elif lookup["type"] == "up":
+                await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'up'", self.mem.id, interaction.user.id)
+                await interaction.response.send_message(f"{interaction.user.mention} cancelled the upvote for this user.")
+                return
 
         await self.bot.db.execute("INSERT INTO repvotes (who, voted, type) VALUES ($1, $2, 'up')", self.mem.id, interaction.user.id)
         await interaction.response.send_message(content=f"{interaction.user.mention} upvoted this member.")
@@ -32,11 +38,17 @@ class UpDownvote(discord.ui.View):
             await interaction.response.send_message("You cannot upvote or downvote yourself.", ephemeral=True)
             return
 
-        lookup = await self.bot.db.fetchrow("SELECT * FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'down'", self.mem.id, interaction.user.id)
+        lookup = await self.bot.db.fetchrow("SELECT * FROM repvotes WHERE who = $1 AND voted = $2", self.mem.id, interaction.user.id)
         if lookup:
-            await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'down'", self.mem.id, interaction.user.id)
-            await interaction.response.send_message(f"{interaction.user.mention} cancelled the downvote for this user.")
-            return
+            if lookup["type"] == "down":
+                await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'down'", self.mem.id, interaction.user.id)
+                await interaction.response.send_message(f"{interaction.user.mention} cancelled the downvote for this user.")
+                return
+            elif lookup["type"] == "up":
+                await self.bot.db.execute("DELETE FROM repvotes WHERE who = $1 AND voted = $2 AND type = 'up'", self.mem.id, interaction.user.id)
+                await self.bot.db.execute("INSERT INTO repvotes (who, voted, type) VALUES ($1, $2, 'down')", self.mem.id, interaction.user.id)
+                await interaction.response.send_message(content=f"{interaction.user.mention} cancelled the upvote and downvoted this member.")
+                return
 
         await self.bot.db.execute("INSERT INTO repvotes (who, voted, type) VALUES ($1, $2, 'down')", self.mem.id, interaction.user.id)
         await interaction.response.send_message(content=f"{interaction.user.mention} downvoted this member.")
@@ -48,8 +60,9 @@ class ModRep(commands.Cog):
 
     @commands.command()
     async def modrep(self, ctx, member: discord.Member):
-        votes = await self.bot.db.fetch("SELECT COUNT(*) FROM repvotes WHERE who = $1", member.id)
-        votes = votes[0]["count"]
+        upvotes = await self.bot.db.fetch("SELECT COUNT(*) FROM repvotes WHERE who = $1 AND type = 'up'", member.id)
+        downvotes = await self.bot.db.fetch("SELECT COUNT(*) FROM repvotes WHERE who = $1 AND type = 'down'", member.id)
+        votes = upvotes[0]["count"] - downvotes[0]["count"]
         embed = discord.Embed(title="Reputation", description=f"{member.mention} has {votes} votes.", color=0x00b2ff)
         await ctx.send(embed=embed, view=UpDownvote(self.bot, member))
 
