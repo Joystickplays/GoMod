@@ -85,6 +85,15 @@ class Helpview(discord.ui.View):
         self.value = "l"
         self.stop()
 
+    @discord.ui.button(label='ModRep', style=discord.ButtonStyle.gray)
+    async def modrep(self, button: discord.ui.Button, interaction: discord.Interaction):
+        if self.ctx.author != interaction.user:
+            await interaction.response.send_message("You can't do this, sorry.", ephemeral=True)
+            return
+
+        self.value = "mr"
+        self.stop()
+
     @discord.ui.button(label='Others', style=discord.ButtonStyle.gray)
     async def other(self, button: discord.ui.Button, interaction: discord.Interaction):
         if self.ctx.author != interaction.user:

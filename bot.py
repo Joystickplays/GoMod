@@ -74,8 +74,7 @@ def evalu(msg, tokens):
 
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-
-activity = discord.Activity(name='for rulebreakers', type=discord.ActivityType.watching)
+activity = discord.Activity(name='over Ukraine.', type=discord.ActivityType.watching)
 intents = discord.Intents.default()
 intents.members = True
 intents.guilds = True
@@ -119,7 +118,8 @@ cogs = [
     "cogs.aimod",
     "cogs.tags",
     "cogs.logging",
-    "cogs.ticketmanagement"
+    "cogs.ticketmanagement",
+    "cogs.modrep"
 ]
 
 for cog in cogs:
@@ -255,7 +255,8 @@ async def reloadallcogs(ctx):
         "cogs.aimod",
         "cogs.tags",
         "cogs.logging",
-        "cogs.ticketmanagement"
+        "cogs.ticketmanagement",
+        "cogs.modrep"
     ]
     for cog in cogs:
         try:
@@ -302,7 +303,7 @@ async def help(ctx):
             embed.add_field(name="--block <member>", value="Blocks a member from the channel this command is run in.", inline=False)
             embed.add_field(name="--unblock <member>", value="Unblocks a member from the channel this command is run in.", inline=False)
             embed.add_field(name="--reactrole", value="Run a reaction role setup.", inline=False)
-            embed.add_field(name="--ticketsetup", value="Run a ticket management setup.", inline=False)
+            # embed.add_field(name="--ticketsetup", value="Run a ticket management setup.", inline=False)
 
         if chosen == "o":
             viewthing.other.disabled = True
@@ -325,6 +326,12 @@ async def help(ctx):
             viewthing.log.style = discord.ButtonStyle.green
             embed = discord.Embed(title="Log help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
             embed.add_field(name="--createlogging", value="Makes a channel a place to log all edits and deletions of messages.  ", inline=False)
+
+        if chosen == "mr":
+            viewthing.modrep.disabled = True
+            viewthing.modrep.style = discord.ButtonStyle.green
+            embed = discord.Embed(title="Moderation Reputation help", description="Us at GoTeam developed a new way of identifiying potentially unwanted members: ModRep (or Moderation Reputation). ModRep allows any member to vote on other members, which if they find a good member, they'll upvote the member. Otherwise, they'll downvote the member.\n\nTip:\n<required>\n[optional]", color=0x00b2ff)
+            embed.add_field(name="--modrep <member>", value="Shows the current ModRep of the member. This will allow you to also upvote or downvote the member this way.", inline=False)
 
         helpmsg = await helpmsg.edit(content=None, embed=embed, view=viewthing)
         await viewthing.wait()
