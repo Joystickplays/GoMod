@@ -49,7 +49,7 @@ class Tickets(commands.Cog):
             await ctx.send("Ticketing is already setup. To remove it, use `--ticketsetup remove`.")
             return
 
-        embed = discord.Embed(title="Ticket Setup", description="Welcome to the ticket setup.\n\nSay \"cancel\" at any point to stop setup. Let's start with something simple. Which channel can the users make their ticket? (Do NOT mention the channel. Instead, use their name.)", color=0x00b2ff)
+        embed = discord.Embed(title="Ticket Setup", description="Welcome to the ticket setup.\n\nSay \"cancel\" at any point to stop setup. Let's start with something simple.\n\nWhich channel can the users make their ticket?\n(Do NOT mention the channel. Instead, use their name.)", color=0x00b2ff)
         await ctx.send(embed=embed)
 
         def check(m):
@@ -93,7 +93,7 @@ class Tickets(commands.Cog):
         if msg.content.lower() == "n" or msg.content.lower() == "no":
             needreason = False
 
-        embed = discord.Embed(title="Ticket Setup", description="Looking good! Last but not least, we need a place for the tickets. Enter a category name where the tickets should be. (Do NOT use a category that's not private. Otherwise, other people will message inside the tickets.", color=0x00b2ff)
+        embed = discord.Embed(title="Ticket Setup", description="Looking good! Last but not least, we need a place for the tickets. \n\nEnter a category name where the tickets should be. \n(Do NOT use a category that's not private. Otherwise, other people will message inside the tickets.", color=0x00b2ff)
         await ctx.send(embed=embed)
 
         try:
@@ -113,7 +113,7 @@ class Tickets(commands.Cog):
                 await ctx.send("That category doesn't exist (Look for upper/lowercase mistakes). Try again...", delete_after=3)
                 return
 
-        await self.bot.db.execute("INSERT INTO ticketconfigs (guild, channel, needreason, category) VALUES ($1, $2, $3, $4)", ctx.guild.id, channel.id, 1 if needreason else 0, category.id)
+        await self.bot.db.execute("INSERT INTO ticketconfigs (guild, channel, needreason, category) VALUES ($1, $2, $3, $4)", ctx.guild.id, channel.id, needreason, category.id)
         await ctx.send("Setup complete! Your members now may create tickets.")
 
     @ticketsetup.command()
