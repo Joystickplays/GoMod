@@ -37,6 +37,8 @@ class Moderation(commands.Cog):
             print(3)
             for entry in lookup:
                 print(4)
+                print(payload.emoji)
+                print(entry["reaction"])
                 if payload.emoji == entry['reaction']:
                     print(5)
                     role = discord.utils.get(user.guild.roles, id=entry['role'])
