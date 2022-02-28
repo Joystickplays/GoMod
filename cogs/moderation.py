@@ -22,7 +22,12 @@ class Moderation(commands.Cog):
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         guild = self.bot.get_guild(payload.guild_id)
-        if user is None or message is None or channel is None:
+        if user is None or message is None or channel is None or guild is None:
+            return
+
+        member = guild.get_member(user.id)
+
+        if member is None:
             return
 
         if user.bot:
@@ -39,7 +44,7 @@ class Moderation(commands.Cog):
                     if role in user.roles:
                         pass
                     else:
-                        await user.add_roles(role)
+                        await member.add_roles(role)
     
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -47,7 +52,12 @@ class Moderation(commands.Cog):
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         guild = self.bot.get_guild(payload.guild_id)
-        if user is None or message is None or channel is None:
+        if user is None or message is None or channel is None or guild is None:
+            return
+
+        member = guild.get_member(user.id)
+
+        if member is None:
             return
 
         if user.bot:
@@ -62,7 +72,7 @@ class Moderation(commands.Cog):
                         return
 
                     if role in user.roles:
-                        await user.remove_roles(role)
+                        await member.remove_roles(role)
         
 
     @commands.Cog.listener()
