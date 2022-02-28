@@ -18,74 +18,50 @@ class Moderation(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        print("add")
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
+        guild = self.bot.get_guild(payload.guild_id)
         if user is None or message is None or channel is None:
             return
 
-        print(1)
-
         if user.bot:
             return
-
-        print(2)
             
         lookup = await self.bot.db.fetch("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
         if lookup:
-            print(3)
             for entry in lookup:
-                print(4)
-                print(payload.emoji)
-                print(entry["reaction"])
                 if str(payload.emoji) == str(entry['reaction']):
-                    print(5)
-                    role = discord.utils.get(user.guild.roles, id=entry['role'])
+                    role = discord.utils.get(guild.roles, id=entry['role'])
                     if role == None:
                         return
-
-                    print(6)
 
                     if role in user.roles:
                         pass
                     else:
                         await user.add_roles(role)
-                        print(7)
     
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        print("rem")
         user = self.bot.get_user(payload.user_id)
-        print(1)
         channel = self.bot.get_channel(payload.channel_id)
-        print(2)
         message = await channel.fetch_message(payload.message_id)
-        print(3)
+        guild = self.bot.get_guild(payload.guild_id)
         if user is None or message is None or channel is None:
             return
 
-        print(4)
-
         if user.bot:
             return
-
-        print(5)
             
         lookup = await self.bot.db.fetch("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
         if lookup:
-            print(6)
             for entry in lookup:
-                print(7)
-                if payload.emoji == entry['reaction']:
-                    print(8)
-                    role = discord.utils.get(user.guild.roles, id=entry['role'])
+                if str(payload.emoji) == str(entry['reaction']):
+                    role = discord.utils.get(guild.roles, id=entry['role'])
                     if role == None:
-                        print(9)
                         return
 
                     if role in user.roles:
-                        print(10)
                         await user.remove_roles(role)
         
 
