@@ -17,11 +17,20 @@ class Moderation(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
-        lookup = await self.bot.db.fetch("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
+    async def on_raw_reaction_add(self, payload):
+        user = self.bot.get_user(payload.user_id)
+        channel = self.bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        if user is None or message is None or channel is None:
+            return
+
+        if user.bot:
+            return
+            
+        lookup = await self.bot.db.fetch("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
         if lookup:
             for entry in lookup:
-                if reaction.emoji == entry['reaction']:
+                if payload.emoji == entry['reaction']:
                     role = discord.utils.get(user.guild.roles, id=entry['role'])
                     if role == None:
                         return
@@ -32,21 +41,27 @@ class Moderation(commands.Cog):
                         await user.add_roles(role)
     
     @commands.Cog.listener()
-    async def on_reaction_remove(self, reaction, user):
-        lookup = await self.bot.db.fetch("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", reaction.message.id, reaction.message.channel.id)
-        if lookup:
-            if user == reaction.message.guild.me:
-                await self.bot.db.execute("DELETE FROM reactroles WHERE message = $1 AND channel = $2 AND reaction = $3", reaction.message.id, reaction.message.channel.id, reaction.emoji)
-                return
+    async def on_raw_reaction_remove(self, payload):
+        user = self.bot.get_user(payload.user_id)
+        channel = self.bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        if user is None or message is None or channel is None:
+            return
 
+        if user.bot:
+            return
+            
+        lookup = await self.bot.db.fetch("SELECT * FROM reactroles WHERE message = $1 AND channel = $2", message.id, message.channel.id)
+        if lookup:
             for entry in lookup:
-                if reaction.emoji == entry['reaction']:
+                if payload.emoji == entry['reaction']:
                     role = discord.utils.get(user.guild.roles, id=entry['role'])
                     if role == None:
                         return
 
                     if role in user.roles:
                         await user.remove_roles(role)
+        
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):

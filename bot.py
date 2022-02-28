@@ -101,7 +101,8 @@ cogs = [
     "cogs.tags",
     "cogs.logging",
     "cogs.ticketmanagement",
-    "cogs.modrep"
+    "cogs.modrep",
+    "cogs.fun"
 ]
 
 for cog in cogs:
@@ -255,7 +256,8 @@ async def reloadallcogs(ctx):
         "cogs.tags",
         "cogs.logging",
         "cogs.ticketmanagement",
-        "cogs.modrep"
+        "cogs.modrep",
+        "cogs.fun"
     ]
     for cog in cogs:
         try:
@@ -301,7 +303,7 @@ async def help(ctx):
             # embed.add_field(name="--unmute <member> [reason]", value="Unmutes a member and if specified, with a reason.", inline=False)
             embed.add_field(name="--block <member>", value="Blocks a member from the channel this command is run in.", inline=False)
             embed.add_field(name="--unblock <member>", value="Unblocks a member from the channel this command is run in.", inline=False)
-            # embed.add_field(name="--reactrole", value="Run a reaction role setup.", inline=False)
+            embed.add_field(name="--reactrole", value="Run a reaction role setup.", inline=False)
             # embed.add_field(name="--ticketsetup", value="Run a ticket management setup.", inline=False)
 
         if chosen == "o":
@@ -345,7 +347,7 @@ async def help(ctx):
 
 @bot.command()
 @commands.is_owner()
-async def sqlquery(ctx, *, query):
+async def sql(ctx, *, query):
     async with ctx.channel.typing():
         try:
             if "SELECT" in query:
@@ -356,6 +358,15 @@ async def sqlquery(ctx, *, query):
                 await ctx.send("Query executed.")
         except Exception as e:
             await ctx.send(e)
+
+@bot.command()
+async def modules(ctx):
+    embed = discord.Embed(title="Installable modules", description="These are modules that can be installed to GoMod for your server. To install a module, run `--instmod <module name>`.", color=0x00b2ff)
+    embed.add_field(name="Tags", value="Tags are a fast way to retrieve text for later use.", inline=False)
+    embed.add_field(name="Ticket management", value="Ticket management is a way to create and manage tickets for your server.", inline=False)
+    embed.add_field(name="Server backups", value="A way to backup and restore your server.", inline=False)
+    embed.add_field(name="Logging", value="Logging will log any message edits or deletion, member joins and leaves, and kicks and bans.", inline=False)
+    await ctx.send(embed=embed)
 
 
 @bot.command()
