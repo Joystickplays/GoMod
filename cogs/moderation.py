@@ -41,7 +41,7 @@ class Moderation(commands.Cog):
                     if role == None:
                         return
 
-                    if role in user.roles:
+                    if role in member.roles:
                         pass
                     else:
                         await member.add_roles(role)
@@ -71,7 +71,7 @@ class Moderation(commands.Cog):
                     if role == None:
                         return
 
-                    if role in user.roles:
+                    if role in member.roles:
                         await member.remove_roles(role)
         
 
