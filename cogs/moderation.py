@@ -39,7 +39,7 @@ class Moderation(commands.Cog):
                 print(4)
                 print(payload.emoji)
                 print(entry["reaction"])
-                if payload.emoji == entry['reaction']:
+                if str(payload.emoji) == str(entry['reaction']):
                     print(5)
                     role = discord.utils.get(user.guild.roles, id=entry['role'])
                     if role == None:
