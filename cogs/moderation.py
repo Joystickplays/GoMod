@@ -44,7 +44,11 @@ class Moderation(commands.Cog):
                     if role in member.roles:
                         pass
                     else:
-                        await member.add_roles(role)
+                        try:
+                            await member.add_roles(role)
+                        except discord.Forbidden:
+                            embed = discord.Embed(title="Urgent message", description=f"A [reaction role]({message.jump_url}) in your server ({guild.name}) is failing to add roles to members. Please check if the reaction role's role ({role.name}) is below GoMod's role and GoMod is able to add roles.", color=discord.Color.red())
+                            await guild.owner.send(embed=embed)
     
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -72,7 +76,11 @@ class Moderation(commands.Cog):
                         return
 
                     if role in member.roles:
-                        await member.remove_roles(role)
+                        try:
+                            await member.remove_roles(role)
+                        except discord.Forbidden:
+                            embed = discord.Embed(title="Urgent message", description=f"A [reaction role]({message.jump_url}) in your server ({guild.name}) is failing to remove roles from members. Please check if the reaction role's role ({role.name}) is below GoMod's role and GoMod is able to remove roles.", color=discord.Color.red())
+                            await guild.owner.send(embed=embed)
         
 
     @commands.Cog.listener()
@@ -226,90 +234,97 @@ class Moderation(commands.Cog):
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
 
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=60)
-        except asyncio.TimeoutError:
-            await ctx.send("Timed out.", delete_after=3)
-            return
+        while True:
+            try:
+                msg = await self.bot.wait_for('message', check=check, timeout=60)
+            except asyncio.TimeoutError:
+                await ctx.send("Timed out.", delete_after=3)
+                return
 
 
-        channelcheck = msg.content.replace(" ", "-")
-        channelcheck2 = channelcheck.lower()
-        channel = discord.utils.get(ctx.guild.text_channels, name=channelcheck2)
-        if channel == None:
-            await ctx.send("That channel doesn't exist.", delete_after=3)
-            return
+            channelcheck = msg.content.replace(" ", "-")
+            channelcheck2 = channelcheck.lower()
+            channel = discord.utils.get(ctx.guild.text_channels, name=channelcheck2)
+            if channel != None:
+                break
+                
+            await ctx.send("That channel doesn't exist. Try again...", delete_after=3)
         
         embed = discord.Embed(title="Reaction role setup", description="2/4\nWhat is your message's ID? More on getting message IDs [here](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-). You can also say \"create one\" to make GoMod create a message for you.", color=0x00b2ff)
         msg = await ctx.send(embed=embed)
 
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=60)   
-        except asyncio.TimeoutError:
-            await ctx.send("Timed out.", delete_after=3)
-            return
-
-        message = None
-
-        if msg.content.lower() == "create one":
-            embed = discord.Embed(title="Reaction role setup", description="3.5/4\nWhat will be the title of the message?", color=0x00b2ff)
-            msg = await ctx.send(embed=embed)
-
+        while True:
             try:
-                title = await self.bot.wait_for('message', check=check, timeout=60)
-            except asyncio.TimeoutError:
-                await ctx.send("Timed out.", delete_after=3)
-                return
-            
-            embed = discord.Embed(title="Reaction role setup", description="3.5/4\nWhat will be the description of the message?", color=0x00b2ff)
-            msg = await ctx.send(embed=embed)
-
-            try:
-                description = await self.bot.wait_for('message', check=check, timeout=60)
+                msg = await self.bot.wait_for('message', check=check, timeout=60)   
             except asyncio.TimeoutError:
                 await ctx.send("Timed out.", delete_after=3)
                 return
 
-            embed = discord.Embed(title=title.content, description=description.content, color=0x00b2ff)
-            message = await channel.send(embed=embed)
+            message = None
 
-            
-        if message == None:
+            if msg.content.lower() == "create one":
+                embed = discord.Embed(title="Reaction role setup", description="3.5/4\nWhat will be the title of the message?", color=0x00b2ff)
+                msg = await ctx.send(embed=embed)
+
+                try:
+                    title = await self.bot.wait_for('message', check=check, timeout=60)
+                except asyncio.TimeoutError:
+                    await ctx.send("Timed out.", delete_after=3)
+                    return
+                
+                embed = discord.Embed(title="Reaction role setup", description="3.5/4\nWhat will be the description of the message?", color=0x00b2ff)
+                msg = await ctx.send(embed=embed)
+
+                try:
+                    description = await self.bot.wait_for('message', check=check, timeout=60)
+                except asyncio.TimeoutError:
+                    await ctx.send("Timed out.", delete_after=3)
+                    return
+
+                embed = discord.Embed(title=title.content, description=description.content, color=0x00b2ff)
+                message = await channel.send(embed=embed)
+                break
+
+                
+            if message == None:
+                try:
+                    message = await channel.fetch_message(int(msg.content))
+                    break
+                except:
+                    await ctx.send("That message doesn't exist. Try again...", delete_after=3)
+
+        while True:
+            embed = discord.Embed(title="Reaction role setup", description="3/4\nWhat will be the emoji for your reaction?", color=0x00b2ff)
+            msg = await ctx.send(embed=embed)
+
             try:
-                message = await channel.fetch_message(int(msg.content))
+                msg = await self.bot.wait_for('message', check=check, timeout=60)
+            except asyncio.TimeoutError:
+                await ctx.send("Timed out.", delete_after=3)
+                return
+
+            reactionname = msg.content
+            try:
+                reaction = await message.add_reaction(msg.content)
+                break
             except:
-                await ctx.send("That message doesn't exist.", delete_after=3)
+                await ctx.send("That emoji is invalid. Try again...", delete_after=3)
+
+        while True:
+            embed = discord.Embed(title="Reaction role setup", description="4/4\nWhat role will be given to the user when they react? (Do NOT mention the role. Instead, use the name.", color=0x00b2ff)
+            msg = await ctx.send(embed=embed)
+
+            try:
+                msg = await self.bot.wait_for('message', check=check, timeout=60)
+            except asyncio.TimeoutError:
+                await ctx.send("Timed out.", delete_after=3)
                 return
 
-        embed = discord.Embed(title="Reaction role setup", description="3/4\nWhat will be the emoji for your reaction?", color=0x00b2ff)
-        msg = await ctx.send(embed=embed)
+            role = discord.utils.get(ctx.guild.roles, name=msg.content)
+            if role != None:
+                break
 
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=60)
-        except asyncio.TimeoutError:
-            await ctx.send("Timed out.", delete_after=3)
-            return
-
-        reactionname = msg.content
-        try:
-            reaction = await message.add_reaction(msg.content)
-        except:
-            await ctx.send("That emoji is invalid.", delete_after=3)
-            return
-
-        embed = discord.Embed(title="Reaction role setup", description="4/4\nWhat role will be given to the user when they react? (Do NOT mention the role. Instead, use the name.", color=0x00b2ff)
-        msg = await ctx.send(embed=embed)
-
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=60)
-        except asyncio.TimeoutError:
-            await ctx.send("Timed out.", delete_after=3)
-            return
-
-        role = discord.utils.get(ctx.guild.roles, name=msg.content)
-        if role == None:
-            await ctx.send("That role doesn't exist.", delete_after=3)
-            return
+            await ctx.send("That role doesn't exist. Try again...", delete_after=3)
 
         await self.bot.db.execute("INSERT INTO reactroles VALUES ($1, $2, $3, $4)", message.id, channel.id, role.id, reactionname)
         embed = discord.Embed(title="Reaction role setup", description="Reaction role setup complete.", color=0x00b2ff)
