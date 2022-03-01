@@ -14,7 +14,7 @@ GoMod may be still in development but I am planning to add features from seperat
 
 ## Do you have a website?
 
-No, for now. GoMod will be a bot that uses the Discord Client to manage the bot, instead of using a website, like other bots.
+No, for now.
 
 ## Can I run your bot for myself?
 
