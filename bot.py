@@ -82,9 +82,10 @@ class GoModBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-bot = GoModBot(command_prefix=commands.when_mentioned_or("--" if os.environ.get("BOT_ENV") == "production" else "->"), activity=activity, intents=intents)
+bot = GoModBot(command_prefix=commands.when_mentioned_or("--" if os.environ.get("BOT_ENV") == "production" else "=="), activity=activity, intents=intents)
 bot.remove_command("help")
 bot.logcache = list()
+bot.logign = list()
 bot.topggheaders = {
     "Authorization": os.environ.get("TOPGG_TOKEN")
 }
@@ -100,7 +101,7 @@ cogs = [
     "cogs.aimod",
     "cogs.tags",
     "cogs.logging",
-    "cogs.ticketmanagement",
+    # "cogs.ticketmanagement",
     "cogs.modrep",
     "cogs.fun"
 ]
@@ -262,7 +263,7 @@ async def reloadallcogs(ctx):
         "cogs.aimod",
         "cogs.tags",
         "cogs.logging",
-        "cogs.ticketmanagement",
+        # "cogs.ticketmanagement",
         "cogs.modrep",
         "cogs.fun"
     ]
