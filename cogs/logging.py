@@ -219,7 +219,7 @@ class Logging(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def loggingignore(self, ctx, channel: discord.TextChannel):
+    async def ignorelogging(self, ctx, channel: discord.TextChannel):
         await self.bot.db.execute("INSERT INTO ignoredlogs (server, channel) VALUES ($1, $2)", ctx.guild.id, channel.id)
         embed = discord.Embed(title="Logging setup", description=f"Channel {channel.mention} has been added to the ignore list.", color=0x00b2ff)
         await ctx.send(embed=embed)

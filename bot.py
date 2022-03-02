@@ -278,6 +278,11 @@ async def reloadallcogs(ctx):
 async def help(ctx):
     chosen = "m"
     helpmsg = await ctx.send("Loading...")
+    rawmodules = await bot.db.fetch("SELECT * FROM modules WHERE server = $1", ctx.guild.id)
+    installedmods = []
+    for module in rawmodules:
+        installedmods.append(module["module"])
+
     while True:
         viewthing = Helpview(ctx)
         if chosen == "a":
@@ -312,14 +317,18 @@ async def help(ctx):
             embed.add_field(name="--unblock <member>", value="Unblocks a member from the channel this command is run in.", inline=False)
             embed.add_field(name="--reactrole", value="Run a reaction role setup.", inline=False)
             # embed.add_field(name="--ticketsetup", value="Run a ticket management setup.", inline=False)
+            embed.add_field(name="--modules", value="Shows a list of installable modules.", inline=False)
+            embed.add_field(name="--instmod <module code>", value="Installs a module.", inline=False)
+            embed.add_field(name="--uninstmod <module code>", value="Uninstalls a module.", inline=False)
 
         if chosen == "o":
             viewthing.other.disabled = True
             viewthing.other.style = discord.ButtonStyle.green
             embed = discord.Embed(title="Other help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
             embed.add_field(name="--vote", value="Show us some love by voting us on top.gg!", inline=False)
-            embed.add_field(name="--tag/t <tag name>", value="Quickly send a message using the specified tag.", inline=False)
-            embed.add_field(name="--tag/t create <tag name> <message>", value="Creates a tag with the name and message included.", inline=False)
+            if "tg" in installedmods:
+                embed.add_field(name="--tag/t <tag name>", value="Quickly send a message using the specified tag.", inline=False)
+                embed.add_field(name="--tag/t create <tag name> <message>", value="Creates a tag with the name and message included.", inline=False)
 
         if chosen == "s":
             viewthing.server.disabled = True
@@ -332,8 +341,12 @@ async def help(ctx):
         if chosen == "l":
             viewthing.log.disabled = True
             viewthing.log.style = discord.ButtonStyle.green
-            embed = discord.Embed(title="Log help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
-            embed.add_field(name="--createlogging", value="Makes a channel a place to log all edits and deletions of messages.  ", inline=False)
+            if "lg" in installedmods:
+                embed = discord.Embed(title="Log help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
+                embed.add_field(name="--createlogging", value="Makes a channel a place to log all edits, deletions of messages and more.", inline=False)
+                embed.add_field(name="--ignorelogging <channel>", value="Logging will ignore this channel.", inline=False)
+            else:
+                embed = discord.Embed(title="Log help", description="Logging is not available for this server yet. A moderator will need to install the `logging` module.", color=0x00b2ff)
 
         if chosen == "mr":
             viewthing.modrep.disabled = True
