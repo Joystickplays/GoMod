@@ -7,6 +7,10 @@ class Tags(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def cog_check(self, ctx):
+        lookup = await self.bot.db.fetchrow("SELECT * FROM modules WHERE server = $1 AND module = $2", ctx.guild.id, "tg")
+        return lookup is not None
+
     @commands.group(invoke_without_command=True, aliases=["t"])
     async def tag(self, ctx, tag):
         lookup = await self.bot.db.fetchrow("SELECT * FROM tags WHERE tagname = $1 AND serverid = $2", tag, ctx.guild.id)

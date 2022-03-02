@@ -124,6 +124,13 @@ async def on_ready():
         tempdict["loggingtype"] = log["loggingtype"]
         bot.logcache.append(tempdict)
     print("Log channels cache locked and loaded B)")
+    ignored = await bot.db.fetch("SELECT * FROM ignoredlogs")
+    for ign in ignored:
+        tempdict = {}
+        tempdict["server"] = ign["server"]
+        tempdict["channel"] = ign["channel"]
+        bot.logign.append(tempdict)
+    print("Ignored logs cache fire!!!")
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -361,13 +368,59 @@ async def sql(ctx, *, query):
 
 @bot.command()
 async def modules(ctx):
-    embed = discord.Embed(title="Installable modules", description="These are modules that can be installed to GoMod for your server. To install a module, run `--instmod <module name>`.", color=0x00b2ff)
-    embed.add_field(name="Tags", value="Tags are a fast way to retrieve text for later use.", inline=False)
-    embed.add_field(name="Ticket management", value="Ticket management is a way to create and manage tickets for your server.", inline=False)
-    embed.add_field(name="Server backups", value="A way to backup and restore your server.", inline=False)
-    embed.add_field(name="Logging", value="Logging will log any message edits or deletion, member joins and leaves, and kicks and bans.", inline=False)
+    embed = discord.Embed(title="Installable modules", description="Modules are a way to extend your use for GoMod. These are modules that can be installed to GoMod for your server. The 2 characters in square brackets is the module code. To install a module, run `--instmod <module code>`.", color=0x00b2ff)
+    embed.add_field(name="[tg] Tags", value="Tags are a fast way to retrieve text for later use.", inline=False)
+    # embed.add_field(name="[tm] Ticket management", value="Ticket management is a way to create and manage tickets for your server.", inline=False)
+    # embed.add_field(name="[sb] Server backups", value="A way to backup and restore your server.", inline=False)
+    embed.add_field(name="[lg] Logging", value="Logging will log any message edits or deletion, member joins and leaves, and kicks and bans.", inline=False)
     await ctx.send(embed=embed)
 
+# Modules codes:
+# tg -> Tags
+# tm -> Ticket management
+# sb -> Server backups
+# lg -> Logging
+
+@bot.command()
+@commands.has_guild_permissions(manage_guild=True, manage_channels=True)
+async def instmod(ctx, module):
+    if module.lower() in ("tg", "lg"):
+        lookup = await bot.db.fetchrow("SELECT * FROM modules WHERE server = $1 AND module = $2", ctx.guild.id, module)
+        if lookup:
+            await ctx.send("This module is already installed.")
+            return
+
+        embed = discord.Embed(title="Installing module", description="This may take a while...", color=0x00b2ff)
+        msg = await ctx.send(embed=embed)
+        await asyncio.sleep(random.randint(1, 3))
+        await bot.db.execute("INSERT INTO modules (server, module) VALUES ($1, $2)", ctx.guild.id, module)
+        embed = discord.Embed(title="Module installed", description="Module installed successfully. If you ever changed your mind, run `--uninstmod <module code>`.", color=0x00b2ff)
+        await msg.edit(embed=embed)
+    else:
+        await ctx.send("Invalid module code. To see a list of codes, run `--modules`.")
+
+@bot.command()
+@commands.has_guild_permissions(manage_guild=True, manage_channels=True)
+async def uninstmod(ctx, module):
+    if module.lower() in ("tg", "lg"):
+        lookup = await bot.db.fetchrow("SELECT * FROM modules WHERE server = $1 AND module = $2", ctx.guild.id, module)
+        if not lookup:
+            await ctx.send("This module is not installed.")
+            return
+
+        embed = discord.Embed(title="Uninstalling module", description="This may take a while...", color=0x00b2ff)
+        msg = await ctx.send(embed=embed)
+        await asyncio.sleep(random.randint(1, 3))
+        if module.lower() == "tg":
+            await bot.db.execute("DELETE FROM tags WHERE serverid = $1", ctx.guild.id)
+        
+        if module.lower() == "lg":
+            await bot.db.execute("DELETE FROM logch WHERE guildid = $1", ctx.guild.id)
+        await bot.db.execute("DELETE FROM modules WHERE server = $1 AND module = $2", ctx.guild.id, module)
+        embed = discord.Embed(title="Module uninstalled", description="Module uninstalled successfully.", color=0x00b2ff)
+        await msg.edit(embed=embed)
+    else:
+        await ctx.send("Invalid module code. To see a list of codes, run `--modules`.")
 
 @bot.command()
 @commands.has_permissions(manage_messages=True)

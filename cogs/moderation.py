@@ -204,7 +204,7 @@ class Moderation(commands.Cog):
     async def purge(self, ctx, amount: int):
         await ctx.channel.purge(limit=amount+1)
         embed = discord.Embed(title="Messages purged", description=f"{amount} messages have been purged.", color=0x00b2ff)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, delete_after=3)
 
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
@@ -228,7 +228,7 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     async def reactrole(self, ctx):
-        embed = discord.Embed(title="Reaction role setup", description="1/4\nWhat channel is the message you're using is in? (Do NOT mention the channel. Instead, use the name.", color=0x00b2ff)
+        embed = discord.Embed(title="Reaction role setup", description="1/4\nWhat channel is the message you're using is in? (Do NOT mention the channel. Instead, use the name.", color=0x00b2ff).set_footer(text="Stuck? Read our [wiki](https://github.com/Joystickplays/GoMod/wiki/Verification-systems).")
         msg = await ctx.send(embed=embed)
 
         def check(m):
@@ -241,6 +241,9 @@ class Moderation(commands.Cog):
                 await ctx.send("Timed out.", delete_after=3)
                 return
 
+            if msg.content.lower() == "cancel":
+                await ctx.send("Cancelled.", delete_after=3)
+                return
 
             channelcheck = msg.content.replace(" ", "-")
             channelcheck2 = channelcheck.lower()
@@ -260,6 +263,10 @@ class Moderation(commands.Cog):
                 await ctx.send("Timed out.", delete_after=3)
                 return
 
+            if msg.content.lower() == "cancel":
+                await ctx.send("Cancelled.", delete_after=3)
+                return
+
             message = None
 
             if msg.content.lower() == "create one":
@@ -271,6 +278,10 @@ class Moderation(commands.Cog):
                 except asyncio.TimeoutError:
                     await ctx.send("Timed out.", delete_after=3)
                     return
+
+                if title.content.lower() == "cancel":
+                    await ctx.send("Cancelled.", delete_after=3)
+                    return
                 
                 embed = discord.Embed(title="Reaction role setup", description="3.5/4\nWhat will be the description of the message?", color=0x00b2ff)
                 msg = await ctx.send(embed=embed)
@@ -279,6 +290,10 @@ class Moderation(commands.Cog):
                     description = await self.bot.wait_for('message', check=check, timeout=60)
                 except asyncio.TimeoutError:
                     await ctx.send("Timed out.", delete_after=3)
+                    return
+
+                if description.content.lower() == "cancel":
+                    await ctx.send("Cancelled.", delete_after=3)
                     return
 
                 embed = discord.Embed(title=title.content, description=description.content, color=0x00b2ff)
@@ -303,6 +318,11 @@ class Moderation(commands.Cog):
                 await ctx.send("Timed out.", delete_after=3)
                 return
 
+            if msg.content.lower() == "cancel":
+                await ctx.send("Cancelled.", delete_after=3)
+                return
+
+
             reactionname = msg.content
             try:
                 reaction = await message.add_reaction(msg.content)
@@ -320,6 +340,10 @@ class Moderation(commands.Cog):
                 await ctx.send("Timed out.", delete_after=3)
                 return
 
+            if msg.content.lower() == "cancel":
+                await ctx.send("Cancelled.", delete_after=3)
+                return
+
             role = discord.utils.get(ctx.guild.roles, name=msg.content)
             if role != None:
                 break
@@ -329,6 +353,7 @@ class Moderation(commands.Cog):
         await self.bot.db.execute("INSERT INTO reactroles VALUES ($1, $2, $3, $4)", message.id, channel.id, role.id, reactionname)
         embed = discord.Embed(title="Reaction role setup", description="Reaction role setup complete.", color=0x00b2ff)
         await ctx.send(embed=embed)
+
 
 
 

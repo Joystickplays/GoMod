@@ -77,13 +77,46 @@ class Fun(commands.Cog):
     #                 await interaction.response.send_message(f"You can't take this quiz. `Run --modquiz` to take a quiz too!", ephemeral=True)
     #                 return
 
+    #             self.result = 1
     #             self.stop()
+        
+    #     class DropDownAnswers(discord.ui.Select):
+    #         def __init__(self, ls):
+    #             self.ls = ls
+                
+    #             ind = 0
+    #             options = []
+    #             for it in ls:
+    #                 options.append(discord.SelectOption(label=it["t"], value=ind, description=it["d"]))
+    #                 ind += 1
 
-    #     embed = discord.Embed("Moderation quiz", description="Answer these questions correctly and you will get 5 GoCash for every question you get right.", color=0x00b2ff)
+    #             super().__init__(placeholder='Choose an answer', min_values=1, max_values=1, options=options)
+
+    #         async def callback(self, interaction: discord.Interaction):
+    #             self.result = self.values[0]
+    #             self.view.stop()
+        
+    #     class AnswersView(discord.ui.View):
+    #         def __init__(self, ls):
+    #             super().__init__()
+
+    #             self.dd = DropDownAnswers(ls)
+    #             self.add_item(self.dd)
+
+    #     embed = discord.Embed(title="Moderation quiz", description="Answer these questions correctly and you will get 5 GoCash for every question you get right.", color=0x00b2ff)
     #     view = TakeQuiz(ctx)
     #     await ctx.send(embed=embed, view=view)
     #     await view.wait()
 
+    #     if view.result is None:
+    #         return
+
+    #     embed = discord.Embed(title="Question 1", description="If your server has a channel that allows you to vent about personal stuff, would you allow image attachments on it?", color=0x00b2ff)
+    #     ddview = AnswersView([{"t":"Yes, I would.","d":"Because this way, other people can express their emotions through image.",},{"t":"Yes, I would.","d":"Because people can send increased context."},{"t":"No, I wouldn't.","d":"Because people may send images that contain self harm or weapons they intend to use."},{"t":"No, I wouldn't.","d":"Because to prevent memes or s*htpost on these channels."}])
+    #     await ctx.send(embed=embed, view=ddview)
+    #     await ddview.wait()
+
+    #     await ctx.send(str(ddview.dd.values[0]))
         
 
 
