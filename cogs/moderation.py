@@ -102,7 +102,7 @@ class Moderation(commands.Cog):
     #     view = MyView()
     #     await ctx.send("Hello! I am GoMod.", view=view)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def kick(self, ctx, member: Option(discord.Member, "Member to kick"), reason: Option(str, "Reason for kicking", required=False)):
         """
         Kick a member from the server.
@@ -125,7 +125,7 @@ class Moderation(commands.Cog):
         embed = discord.Embed(title="Kicked", description=f"{member.mention} has been kicked from {ctx.guild.name} with reason: {reason}", color=0x00b2ff)
         await ctx.respond(embed=embed)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def ban(self, ctx, member: Option(discord.Member, "Member to ban"), reason: Option(str, "Reason for banning", required=False)):
         """
         Bans a member from the server.
@@ -150,7 +150,7 @@ class Moderation(commands.Cog):
         embed = discord.Embed(title="Banned", description=f"{member.mention} has been banned from {ctx.guild.name} with reason: {reason}", color=0x00b2ff)
         await ctx.respond(embed=embed)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def block(self, ctx, member: discord.Member):
         """
         Blocks a member from the current channel.
@@ -181,7 +181,7 @@ class Moderation(commands.Cog):
     #     embed = discord.Embed(title="Unblocked", description=f"{member.mention} has been unblocked from {ctx.channel.mention}", color=0x00b2ff)
     #     await ctx.send(embed=embed)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def unblock(self, ctx, member: Option(discord.Member, "Member to unblock")):
         """
         Unblocks a member from the current channel.
@@ -202,7 +202,7 @@ class Moderation(commands.Cog):
         await ctx.respond(embed=embed)
     
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def warn(self, ctx, member: Option(discord.Member, "Member to warn"), reason: Option(str, "Reason for warning", required=False)):
         """
         Warns a member.
@@ -230,7 +230,7 @@ class Moderation(commands.Cog):
         embed = discord.Embed(title="Warned", description=f"{member.mention} has been warned by {ctx.author.mention} for {reason}", color=0x00b2ff)
         await ctx.respond(embed=embed)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def clearwarns(self, ctx, member: Option(discord.Member, "Member to clear warnings for")):
         """
         Clears all warnings for a member.
@@ -248,7 +248,7 @@ class Moderation(commands.Cog):
         embed = discord.Embed(title="Warns cleared", description=f"{member.mention}'s warnings have been cleared.", color=0x00b2ff)
         await ctx.respond(embed=embed)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def purge(self, ctx, amount: Option(int, "Amount of messages to delete", min_value=1, max_value=1000)):
         """
         Purges a specified amount of messages from the current channel.
@@ -260,7 +260,7 @@ class Moderation(commands.Cog):
         embed = discord.Embed(title="Messages purged", description=f"{amount} messages have been purged.", color=0x00b2ff)
         await ctx.send(embed=embed, delete_after=3)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def warns(self, ctx, member: Option(discord.Member, "Member to view warnings for")):
         """
         Lists all the warns a member has.
@@ -284,7 +284,7 @@ class Moderation(commands.Cog):
             embed.add_field(name=f"{warn['reason']}", value=f"Warned by {ctx.guild.get_member(warn['invokerid']).mention}", inline=False)
         await ctx.respond(embed=embed)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def reactrole(self, ctx, channel: Option(discord.TextChannel, "The channel the message is in"), message: Option(str, "The message that will have the reaction in ID form."), emoji: Option(str, "The emoji to react with"), role: Option(discord.Role, "The role to give to the user")):
         """
         Run a reaction role setup.

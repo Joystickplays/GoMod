@@ -388,7 +388,7 @@ async def sql(ctx, *, query):
         except Exception as e:
             await ctx.send(e)
 
-@bot.slash_command(guild_ids=[940076462881513482])
+@bot.slash_command()
 async def modules(ctx):
     """
     Shows a list of installable modules.

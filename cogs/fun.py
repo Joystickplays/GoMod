@@ -34,7 +34,7 @@ class Fun(commands.Cog):
         self.bot = bot
         
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def gcbal(self, ctx, member: Option(discord.Member, "Which member to check.", required=False)):
         """
         Get the current balance of a user.
@@ -48,7 +48,7 @@ class Fun(commands.Cog):
 
         await ctx.respond(embed=embed)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def givegc(self, ctx, member: Option(discord.Member, "Which member to give the GCs."), amount: Option(int, "The amount of GCs to give", min_value=1, default=1)):
         """
         Give GoCash to a user.
