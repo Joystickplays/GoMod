@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.commands import slash_command, Option
 import asyncio
 from bot import GoModBot
 
@@ -33,8 +34,11 @@ class Fun(commands.Cog):
         self.bot = bot
         
 
-    @commands.command()
-    async def gcbal(self, ctx, member: discord.Member = None):
+    @slash_command(guild_ids=[940076462881513482])
+    async def gcbal(self, ctx, member: Option(discord.Member, "Which member to check.", required=False)):
+        """
+        Get the current balance of a user.
+        """
         bal = await getc(self, ctx.author.id if member is None else member.id)
 
         if member is None:
@@ -42,26 +46,29 @@ class Fun(commands.Cog):
         else:
             embed = discord.Embed(title="Balance", description=f"{member.name}'s current GoCash balance is: {bal} GCs.", color=0x00b2ff)
 
-        await ctx.send(embed=embed)
+        await ctx.respond(embed=embed)
 
-    @commands.command()
-    async def givegc(self, ctx, member: discord.Member, amount: int):
+    @slash_command(guild_ids=[940076462881513482])
+    async def givegc(self, ctx, member: Option(discord.Member, "Which member to give the GCs."), amount: Option(int, "The amount of GCs to give", min_value=1, default=1)):
+        """
+        Give GoCash to a user.
+        """
         cash = await getc(self, ctx.author.id)
         if member.id == ctx.author.id:
-            await ctx.send("You can't give yourself GoCash.")
+            await ctx.respond("You can't give yourself GoCash.")
             return
 
         if amount < 0:
-            await ctx.send("You can't give 0 or less GoCash.")
+            await ctx.respond("You can't give 0 or less GoCash.")
             return
 
         if cash < amount:
-            await ctx.send("You don't have enough GoCash to give.")
+            await ctx.respond("You don't have enough GoCash to give.")
             return
 
         await decrec(self, ctx.author.id, amount)
         await increc(self, member.id, amount)
-        await ctx.send(f"You gave {amount} GC to {member.name}.")
+        await ctx.respond(f"You gave {amount} GC to {member.name}.")
 
     # @commands.command()
     # async def modquiz(self, ctx):

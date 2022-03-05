@@ -1,7 +1,6 @@
 print('Loading cogs...')
 import discord
-
-from discord.ext import commands, tasks
+from discord.ext import commands
 import os
 
 import asyncio
@@ -15,12 +14,16 @@ import random
 import traceback
 import sys
 import json
+import warnings
+from discord.commands import Option, permissions
 
 from dotenv import load_dotenv
 
 from cogs.views import Caseactionsview, Helpview
 
 load_dotenv()
+
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
 
 async def delallchannels(context):
@@ -158,6 +161,8 @@ async def on_guild_channel_delete(channel):
             embed = discord.Embed(title="Logging channel deleted", description=f"Logs channel for your server `{channel.guild.name}` has been unexpectedly deleted. You will need to restart setup to fix this.", color=discord.Color.red())
             await channel.guild.owner.send(embed=embed)
 
+    await bot.db.execute("DELETE FROM logch WHERE channelid = $1", channel.id)
+
 @bot.event
 async def on_guild_remove(guild):
     servers = await bot.db.fetch("SELECT * FROM discservers")
@@ -165,10 +170,11 @@ async def on_guild_remove(guild):
         if server["discordid"] == guild.id:
             await bot.db.execute("DELETE FROM discservers WHERE discordid = $1", guild.id)
             await bot.db.execute("DELETE FROM ignoredchannels WHERE serverid = $1", guild.id)
+            await bot.db.execute("DELETE FROM logch WHERE guildid = $1", guild.id)
 
 @bot.event
 async def on_guild_join(guild):
-    user = bot.get_user(534596269574979595)
+    user = bot.get_user(534596269574979595) # me
     await user.send(f"I have been added to a new server: {guild.name}")
     
 
@@ -277,8 +283,10 @@ async def reloadallcogs(ctx):
 
 @bot.command()
 async def help(ctx):
+    """
+    Shows a list of usable commands.
+    """
     chosen = "m"
-    helpmsg = await ctx.send("Loading...")
     rawmodules = await bot.db.fetch("SELECT * FROM modules WHERE server = $1", ctx.guild.id)
     installedmods = []
     for module in rawmodules:
@@ -303,29 +311,29 @@ async def help(ctx):
         if chosen == "m":
             viewthing.mod.disabled = True
             viewthing.mod.style = discord.ButtonStyle.green
-            embed = discord.Embed(title="Moderator help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
-            embed.add_field(name="--kick <member> [reason]", value="Kicks a member and if specified, with a reason.", inline=False)
-            embed.add_field(name="--ban <member> [reason]", value="Bans a member and if specified, with a reason.", inline=False)
-            embed.add_field(name="--warn <member> [reason]", value="Warns a member.", inline=False)
-            embed.add_field(name="--warns <member>", value="Lists all the warnings the member has.", inline=False)
-            embed.add_field(name="--clearwarns <member>", value="Clears all warnings the member has.", inline=False)
-            embed.add_field(name="--purge <amount>", value="Deletes the specificed number of messages.", inline=False)
+            embed = discord.Embed(title="Moderator help", description="**We are now migrating to Slash commands, so use / instead of --\n\nTip:\n<required>\n[optional]\nPrefix: /", color=0x00b2ff)
+            embed.add_field(name="/kick <member> [reason]", value="Kicks a member and if specified, with a reason.", inline=False)
+            embed.add_field(name="/ban <member> [reason]", value="Bans a member and if specified, with a reason.", inline=False)
+            embed.add_field(name="/warn <member> [reason]", value="Warns a member.", inline=False)
+            embed.add_field(name="/warns <member>", value="Lists all the warnings the member has.", inline=False)
+            embed.add_field(name="/clearwarns <member>", value="Clears all warnings the member has.", inline=False)
+            embed.add_field(name="/purge <amount>", value="Deletes the specificed number of messages.", inline=False)
             embed.add_field(name="???", value="Coming soon.", inline=False)
-            # embed.add_field(name="--mute <member> [reason]", value="Mutes a member and if specified, with a reason.", inline=False)
+            # embed.add_field(name="/mute <member> [reason]", value="Mutes a member and if specified, with a reason.", inline=False)
             embed.add_field(name="???", value="Coming soon.", inline=False)
-            # embed.add_field(name="--unmute <member> [reason]", value="Unmutes a member and if specified, with a reason.", inline=False)
-            embed.add_field(name="--block <member>", value="Blocks a member from the channel this command is run in.", inline=False)
-            embed.add_field(name="--unblock <member>", value="Unblocks a member from the channel this command is run in.", inline=False)
-            embed.add_field(name="--reactrole", value="Run a reaction role setup.", inline=False)
-            # embed.add_field(name="--ticketsetup", value="Run a ticket management setup.", inline=False)
-            embed.add_field(name="--modules", value="Shows a list of installable modules.", inline=False)
+            # embed.add_field(name="/unmute <member> [reason]", value="Unmutes a member and if specified, with a reason.", inline=False)
+            embed.add_field(name="/block <member>", value="Blocks a member from the channel this command is run in.", inline=False)
+            embed.add_field(name="/unblock <member>", value="Unblocks a member from the channel this command is run in.", inline=False)
+            embed.add_field(name="/reactrole", value="Run a reaction role setup.", inline=False)
+            # embed.add_field(name="/ticketsetup", value="Run a ticket management setup.", inline=False)
+            embed.add_field(name="/modules", value="Shows a list of installable modules.", inline=False)
             embed.add_field(name="--instmod <module code>", value="Installs a module.", inline=False)
             embed.add_field(name="--uninstmod <module code>", value="Uninstalls a module.", inline=False)
 
         if chosen == "o":
             viewthing.other.disabled = True
             viewthing.other.style = discord.ButtonStyle.green
-            embed = discord.Embed(title="Other help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
+            embed = discord.Embed(title="Other help", description="Tip:\n<required>\n[optional]\nPrefix: --", color=0x00b2ff)
             embed.add_field(name="--vote", value="Show us some love by voting us on top.gg!", inline=False)
             if "tg" in installedmods:
                 embed.add_field(name="--tag/t <tag name>", value="Quickly send a message using the specified tag.", inline=False)
@@ -334,7 +342,7 @@ async def help(ctx):
         if chosen == "s":
             viewthing.server.disabled = True
             viewthing.server.style = discord.ButtonStyle.green
-            embed = discord.Embed(title="Server backups help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
+            embed = discord.Embed(title="Server backups help", description="Tip:\n<required>\n[optional]\nPrefix: --", color=0x00b2ff)
             embed.add_field(name="--createbackup", value="Creates a server backup file for you. The backup for now only includes channels and roles. (THIS WILL OVERWRITE EXISTING BACKUPS!)", inline=False)
             embed.add_field(name="--applybackup <file>", value="Applies a backup to your server. The backup must be a valid backup file.", inline=False)
 
@@ -343,7 +351,7 @@ async def help(ctx):
             viewthing.log.disabled = True
             viewthing.log.style = discord.ButtonStyle.green
             if "lg" in installedmods:
-                embed = discord.Embed(title="Log help", description="Tip:\n<required>\n[optional]", color=0x00b2ff)
+                embed = discord.Embed(title="Log help", description="Tip:\n<required>\n[optional]\nPrefix: --", color=0x00b2ff)
                 embed.add_field(name="--createlogging", value="Makes a channel a place to log all edits, deletions of messages and more.", inline=False)
                 embed.add_field(name="--ignorelogging <channel>", value="Logging will ignore this channel.", inline=False)
             else:
@@ -352,10 +360,10 @@ async def help(ctx):
         if chosen == "mr":
             viewthing.modrep.disabled = True
             viewthing.modrep.style = discord.ButtonStyle.green
-            embed = discord.Embed(title="Moderation Reputation help", description="Us at GoTeam developed a new way of identifiying potentially unwanted members: ModRep (or Moderation Reputation). ModRep allows any member to vote on other members, which if they find a good member, they'll upvote the member. Otherwise, they'll downvote the member.\n\nTip:\n<required>\n[optional]", color=0x00b2ff)
+            embed = discord.Embed(title="Moderation Reputation help", description="Us at GoTeam developed a new way of identifiying potentially unwanted members: ModRep (or Moderation Reputation). ModRep allows any member to vote on other members, which if they find a good member, they'll upvote the member. Otherwise, they'll downvote the member.\n\nTip:\n<required>\n[optional]\nPrefix: --", color=0x00b2ff)
             embed.add_field(name="--modrep <member>", value="Shows the current ModRep of the member. This will allow you to also upvote or downvote the member this way.", inline=False)
 
-        helpmsg = await helpmsg.edit(content=None, embed=embed, view=viewthing)
+        helpmsg = await ctx.send(content=None, embed=embed, view=viewthing)
         await viewthing.wait()
         chosen = viewthing.value
         if chosen == "x" or chosen == None:
@@ -380,14 +388,18 @@ async def sql(ctx, *, query):
         except Exception as e:
             await ctx.send(e)
 
-@bot.command()
+@bot.slash_command(guild_ids=[940076462881513482])
 async def modules(ctx):
+    """
+    Shows a list of installable modules.
+    """
     embed = discord.Embed(title="Installable modules", description="Modules are a way to extend your use for GoMod. These are modules that can be installed to GoMod for your server. The 2 characters in square brackets is the module code. To install a module, run `--instmod <module code>`.", color=0x00b2ff)
     embed.add_field(name="[tg] Tags", value="Tags are a fast way to retrieve text for later use.", inline=False)
     # embed.add_field(name="[tm] Ticket management", value="Ticket management is a way to create and manage tickets for your server.", inline=False)
     # embed.add_field(name="[sb] Server backups", value="A way to backup and restore your server.", inline=False)
     embed.add_field(name="[lg] Logging", value="Logging will log any message edits or deletion, member joins and leaves, and kicks and bans.", inline=False)
-    await ctx.send(embed=embed)
+    embed.add_field(name="[qa] Question and answer", value="**UNSTABLE MODULE** Allows your members to answer questions you provide. If a member get **x** questions right, they will get something.", inline=False)
+    await ctx.respond(embed=embed)
 
 # Modules codes:
 # tg -> Tags
@@ -398,25 +410,38 @@ async def modules(ctx):
 @bot.command()
 @commands.has_guild_permissions(manage_guild=True, manage_channels=True)
 async def instmod(ctx, module):
-    if module.lower() in ("tg", "lg"):
-        lookup = await bot.db.fetchrow("SELECT * FROM modules WHERE server = $1 AND module = $2", ctx.guild.id, module)
-        if lookup:
-            await ctx.send("This module is already installed.")
+    """
+    Installs a module.
+    """
+    rawallowed = await bot.db.fetch("SELECT * FROM testerguilds")
+    allowed = []
+    for i in rawallowed:
+        allowed.append(i["id"])
+    if not module.lower() in ("tg", "lg", "qa"):
+        await ctx.send("Invalid module code. To see a list of codes, run `--modules`.")
+        return
+    elif module.lower() in ("qa"):
+        if not ctx.guild.id in allowed:
+            embed = discord.Embed(title="Exclusive module", description="This is a module restricted to a few guilds. This is due to the module still being unstable. Once we get it fixed, we'll release this module to every guild ASAP!", color=0x00b2ff)
+            await ctx.send(embed=embed)
             return
 
-        embed = discord.Embed(title="Installing module", description="This may take a while...", color=0x00b2ff)
-        msg = await ctx.send(embed=embed)
-        await asyncio.sleep(random.randint(1, 3))
-        await bot.db.execute("INSERT INTO modules (server, module) VALUES ($1, $2)", ctx.guild.id, module)
-        embed = discord.Embed(title="Module installed", description="Module installed successfully. If you ever changed your mind, run `--uninstmod <module code>`.", color=0x00b2ff)
-        await msg.edit(embed=embed)
-    else:
-        await ctx.send("Invalid module code. To see a list of codes, run `--modules`.")
+    lookup = await bot.db.fetchrow("SELECT * FROM modules WHERE server = $1 AND module = $2", ctx.guild.id, module)
+    if lookup:
+        await ctx.send("This module is already installed.")
+        return
+        
+    embed = discord.Embed(title="Installing module", description="This may take a while...", color=0x00b2ff)
+    msg = await ctx.send(embed=embed)
+    await asyncio.sleep(random.randint(1, 3))
+    await bot.db.execute("INSERT INTO modules (server, module) VALUES ($1, $2)", ctx.guild.id, module)
+    embed = discord.Embed(title="Module installed", description="Module installed successfully. If you ever changed your mind, run `--uninstmod <module code>`.", color=0x00b2ff)
+    await msg.edit(embed=embed)
 
 @bot.command()
 @commands.has_guild_permissions(manage_guild=True, manage_channels=True)
 async def uninstmod(ctx, module):
-    if module.lower() in ("tg", "lg"):
+    if module.lower() in ("tg", "lg", "qa"):
         lookup = await bot.db.fetchrow("SELECT * FROM modules WHERE server = $1 AND module = $2", ctx.guild.id, module)
         if not lookup:
             await ctx.send("This module is not installed.")
@@ -452,6 +477,8 @@ async def vote(ctx):
             data = await r.json()
             if data['voted'] == 1:
                 await msg.edit(embed=discord.Embed(title="Vote", description="Yay! It looks like you already voted for this bot. Thank you!", color=0x00b2ff))
+
+
 
 # @bot.command()
 # @commands.has_permissions(manage_guild=True)
