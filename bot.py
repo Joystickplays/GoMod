@@ -7,14 +7,15 @@ import asyncio
 import asyncpg
 import aiohttp
 
-from io import StringIO
+# from io import StringIO
 import time
 import openai
 import random
 import traceback
 import sys
-import json
+# import json
 import warnings
+import datetime
 from discord.commands import Option, permissions
 
 from dotenv import load_dotenv
@@ -89,6 +90,7 @@ bot = GoModBot(command_prefix=commands.when_mentioned_or("--" if os.environ.get(
 bot.remove_command("help")
 bot.logcache = list()
 bot.logign = list()
+bot.starttime = datetime.datetime.utcnow()
 bot.topggheaders = {
     "Authorization": os.environ.get("TOPGG_TOKEN")
 }
@@ -231,7 +233,16 @@ async def on_guild_join(guild):
 
 @bot.command()
 async def ping(ctx):
-    await ctx.send(f"Pong! {round(bot.latency * 1000)}ms.")
+    delta_uptime = datetime.datetime.utcnow() - bot.starttime
+    hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    days, hours = divmod(hours, 24)
+    embed = discord.Embed(title="Bot info and ping", color=discord.Color.blue())
+    embed.add_field(name="Bot latency", value=f"{round(bot.latency * 1000)}ms", inline=False)
+    embed.add_field(name="Database latency", value="<1ms", inline=True)
+    embed.add_field(name="Bot uptime", value=f"{days}d {hours}h {minutes}m {seconds}s ", inline=False)
+    embed.add_field(name="System uptime", value=f"{os.popen('uptime -p').read()[:-1]}", inline=True)
+    await ctx.send(embed=embed)
 
 @bot.command()
 @commands.is_owner()
