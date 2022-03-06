@@ -113,7 +113,7 @@ class Moderation(commands.Cog):
         if member == ctx.author:
             await ctx.respond("You cannot kick yourself.", delete_after=3)
             return
-        if member.top_role >= ctx.author.top_role:
+        if len(member.roles) > 0 and member.top_role >= ctx.author.top_role:
             await ctx.respond("You cannot kick members with a higher role than you.", delete_after=3)
             return
         try:
@@ -138,7 +138,7 @@ class Moderation(commands.Cog):
             await ctx.respond("You cannot ban yourself.", delete_after=3)
             return
 
-        if member.top_role >= ctx.author.top_role:
+        if len(member.roles) > 0 and member.top_role >= ctx.author.top_role:
             await ctx.respond("You cannot ban members with a higher role than you.", delete_after=3)
             return
         try:
@@ -161,7 +161,7 @@ class Moderation(commands.Cog):
         if member == ctx.author:
             await ctx.respond("You cannot block yourself.", delete_after=3)
             return
-        if member.top_role >= ctx.author.top_role:
+        if len(member.roles) > 0 and member.top_role >= ctx.author.top_role:
             await ctx.respond("You cannot block members with a higher role than you.", delete_after=3)
             return
         await ctx.channel.set_permissions(member, add_reactions = False, send_messages = False)
@@ -194,7 +194,7 @@ class Moderation(commands.Cog):
             await ctx.respond("You cannot unblock yourself.", delete_after=3)
             return
 
-        if member.top_role >= ctx.author.top_role:
+        if len(member.roles) > 0 and member.top_role >= ctx.author.top_role:
             await ctx.respond("You cannot unblock members with a higher role than you.", delete_after=3)
             return
         await ctx.channel.set_permissions(member, add_reactions = True, send_messages = True)
@@ -213,7 +213,7 @@ class Moderation(commands.Cog):
         if member == ctx.author:
             await ctx.respond("You cannot warn yourself.", delete_after=3)
             return
-        if member.top_role >= ctx.author.top_role:
+        if len(member.roles) > 0 and member.top_role >= ctx.author.top_role:
             await ctx.respond("You cannot warn members with a higher role than you.", delete_after=3)
             return
         try:
@@ -241,7 +241,7 @@ class Moderation(commands.Cog):
         if member == ctx.author:
             await ctx.respond("You cannot clear your own warnings.", delete_after=3)
             return
-        if member.top_role >= ctx.author.top_role:
+        if len(member.roles) > 0 and member.top_role >= ctx.author.top_role:
             await ctx.respond("You cannot clear warnings of members with a higher role than you.", delete_after=3)
             return
         await self.bot.db.execute("DELETE FROM warns WHERE userid = $1 AND serverid = $2", member.id, ctx.guild.id)
@@ -271,7 +271,7 @@ class Moderation(commands.Cog):
         if member == ctx.author:
             await ctx.respond("You cannot view your own warnings.", delete_after=3)
             return
-        if member.top_role >= ctx.author.top_role:
+        if len(member.roles) > 0 and member.top_role >= ctx.author.top_role:
             await ctx.respond("You cannot view warnings of members with a higher role than you.", delete_after=3)
             return
         warns = await self.bot.db.fetch("SELECT * FROM warns WHERE userid = $1 AND serverid = $2", member.id, ctx.guild.id)
