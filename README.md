@@ -4,7 +4,7 @@ GoMod is a moderator bot that's aiming to make moderation easy for everyone. ![D
 
 ## What is this project?
 
-This is a hobby project of mine. This is just a moderator bot I built for Discord for fun.
+This is supposedly an all-in-one moderator bot I built for Discord.
 
 ## What makes it stand out from other competitors?
 
