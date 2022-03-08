@@ -16,4 +16,4 @@ No, for now.
 
 ## Can I run your bot for myself?
 
-I don't really allow those, but you can git clone it and run it on your own server.
+I don't really allow those, but you can git clone it and run it on your own server. Make sure your server is Ubuntu, otherwise the command "ping" won't work (Ubuntu is needed to show system uptime).
