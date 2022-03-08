@@ -281,6 +281,7 @@ async def help(ctx):
     Shows a list of usable commands.
     """
     chosen = "m"
+    helpmsg = await ctx.send("Loading...")
     rawmodules = await bot.db.fetch("SELECT * FROM modules WHERE server = $1", ctx.guild.id)
     installedmods = []
     for module in rawmodules:
@@ -357,7 +358,7 @@ async def help(ctx):
             embed = discord.Embed(title="Moderation Reputation help", description="Us at GoTeam developed a new way of identifiying potentially unwanted members: ModRep (or Moderation Reputation). ModRep allows any member to vote on other members, which if they find a good member, they'll upvote the member. Otherwise, they'll downvote the member.\n\nTip:\n<required>\n[optional]\nPrefix: --", color=0x00b2ff)
             embed.add_field(name="--modrep <member>", value="Shows the current ModRep of the member. This will allow you to also upvote or downvote the member this way.", inline=False)
 
-        helpmsg = await ctx.send(content=None, embed=embed, view=viewthing)
+        helpmsg = await helpmsg.edit(content=None, embed=embed, view=viewthing)
         await viewthing.wait()
         chosen = viewthing.value
         if chosen == "x" or chosen == None:
