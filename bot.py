@@ -103,6 +103,8 @@ db_credentials = {
 bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_credentials))
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
+        if filename == "views.py":
+            continue
         bot.load_extension(f'cogs.{filename[:-3]}')
 
 @bot.event
@@ -267,7 +269,9 @@ async def unloadcog(ctx, cog):
 @commands.is_owner()
 async def reloadallcogs(ctx):
     for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
+        if filename.endswith('.py'):
+            if filename == "views.py":
+                continue
             bot.unload_extension(f"cogs.{filename[:-3]}")
             bot.load_extension(f"cogs.{filename[:-3]}")
 
