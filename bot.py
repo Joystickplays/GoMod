@@ -267,13 +267,21 @@ async def unloadcog(ctx, cog):
 
 @bot.command()
 @commands.is_owner()
-async def reloadallcogs(ctx):
+async def recogs(ctx):
     for filename in os.listdir("./cogs"):
         if filename.endswith('.py'):
             if filename == "views.py":
                 continue
             bot.unload_extension(f"cogs.{filename[:-3]}")
             bot.load_extension(f"cogs.{filename[:-3]}")
+
+    await ctx.send("Reloaded all cogs!")
+
+@bot.command()
+@commands.is_owner()
+async def rsl(ctx):
+    await bot.sync_commands()
+    await ctx.send("Reloaded slash commands!")
 
 @bot.command()
 async def help(ctx):
@@ -358,6 +366,17 @@ async def help(ctx):
             embed = discord.Embed(title="Moderation Reputation help", description="Us at GoTeam developed a new way of identifiying potentially unwanted members: ModRep (or Moderation Reputation). ModRep allows any member to vote on other members, which if they find a good member, they'll upvote the member. Otherwise, they'll downvote the member.\n\nTip:\n<required>\n[optional]\nPrefix: --", color=0x00b2ff)
             embed.add_field(name="--modrep <member>", value="Shows the current ModRep of the member. This will allow you to also upvote or downvote the member this way.", inline=False)
 
+        if chosen == "cc":
+            viewthing.cc.disabled = True
+            viewthing.cc.style = discord.ButtonStyle.green
+            embed = discord.Embed(title="Custom currency help (CC for short)", description="Custom currency are a great way to keep users engaged at your server and reward them with their earnings.\n\nTip:\n<required>\n[optional]\nPrefix: --", color=0x00b2ff)
+            embed.add_field(name="/cccreate <currency name>" , value="Creates a custom currency with the specified name.", inline=False)
+            embed.add_field(name="/ccremove", value="Removes the currency system.", inline=False)
+            embed.add_field(name="/add", value="Adds the specified amount of currency to the user.", inline=False)
+            embed.add_field(name="/remove", value="Removes the specified amount of currency from the user.", inline=False)
+            embed.add_field(name="/give", value="Gives the specified amount of currency to the user.", inline=False)
+            embed.add_field(name="/flipbet <amount> <cointype>", value="Flip a coin and get or lose from the outcome.", inline=False)
+
         helpmsg = await helpmsg.edit(content=None, embed=embed, view=viewthing)
         await viewthing.wait()
         chosen = viewthing.value
@@ -394,6 +413,7 @@ async def modules(ctx):
     # embed.add_field(name="[sb] Server backups", value="A way to backup and restore your server.", inline=False)
     embed.add_field(name="[lg] Logging", value="Logging will log any message edits or deletion, member joins and leaves, and kicks and bans.", inline=False)
     embed.add_field(name="[qa] Question and answer", value="**UNSTABLE MODULE** Allows your members to answer questions you provide. If a member get **x** questions right, they will get something.", inline=False)
+    # embed.add_field(name="[cc] Custom currency", value="Allows you to create a custom currency system for your server.", inline=False)
     await ctx.respond(embed=embed)
 
 # Modules codes:
@@ -412,7 +432,7 @@ async def instmod(ctx, module):
     allowed = []
     for i in rawallowed:
         allowed.append(i["id"])
-    if not module.lower() in ("tg", "lg", "qa"):
+    if not module.lower() in ("tg", "lg", "qa", "cc"):
         await ctx.send("Invalid module code. To see a list of codes, run `--modules`.")
         return
     elif module.lower() in ("qa"):
