@@ -101,18 +101,9 @@ db_credentials = {
     'database': os.environ.get("DB_NAME")
 }
 bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_credentials))
-cogs = [
-    "cogs.moderation",
-    "cogs.aimod",
-    "cogs.tags",
-    "cogs.logging",
-    # "cogs.ticketmanagement",
-    "cogs.modrep",
-    "cogs.fun"
-]
-
-for cog in cogs:
-    bot.load_extension(cog)
+for filename in os.listdir('./cogs'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'cogs.{filename[:-3]}')
 
 @bot.event
 async def on_ready():
@@ -275,22 +266,10 @@ async def unloadcog(ctx, cog):
 @bot.command()
 @commands.is_owner()
 async def reloadallcogs(ctx):
-    cogs = [
-        "cogs.moderation",
-        "cogs.aimod",
-        "cogs.tags",
-        "cogs.logging",
-        # "cogs.ticketmanagement",
-        "cogs.modrep",
-        "cogs.fun"
-    ]
-    for cog in cogs:
-        try:
-            bot.unload_extension(f"{cog}")
-            bot.load_extension(f"{cog}")
-        except Exception as e:
-            await ctx.send(f"Error: {e}")
-    await ctx.send("Reloaded all cogs!")
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            bot.unload_extension(f"cogs.{filename[:-3]}")
+            bot.load_extension(f"cogs.{filename[:-3]}")
 
 @bot.command()
 async def help(ctx):
