@@ -35,7 +35,7 @@ class Currency(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # @slash_command(guild_ids=[940076462881513482])
+    # @slash_command()
     # async def ccsetup(self, ctx, *, currencyname: Option(str, "The name of the currency. For example, if you do G$: 10G$")):
     #     """
     #     Setup the currency system.
@@ -52,7 +52,7 @@ class Currency(commands.Cog):
     #     await self.bot.db.execute("INSERT INTO currency (guildid, currencyname) VALUES ($1, $2)", ctx.guild.id, currencyname)
     #     await ctx.respond("Currency system set up! try doing /ccbal to see your balance.")
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def cccreate(self, ctx, currencyabbv: Option(str, "The abbreviation of the currency. For example, if you do G$: 10 G$")):
         """
         Setup the currency system.
@@ -69,7 +69,7 @@ class Currency(commands.Cog):
         await self.bot.db.execute("INSERT INTO currency (guildid, currencyname) VALUES ($1, $2)", ctx.guild.id, currencyabbv)
         await ctx.respond("Currency system set up! try doing /bal to see your balance.", ephemeral=True)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def ccremove(self, ctx):
         """
         Remove the currency system. This will remove all currency from all members!
@@ -88,7 +88,7 @@ class Currency(commands.Cog):
         await ctx.respond("Currency system removed.", ephemeral=True)
         
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def bal(self, ctx, member: Option(discord.Member, "Which member to check.", required=False)):
         """
         Get the current balance of a user.
@@ -106,7 +106,7 @@ class Currency(commands.Cog):
 
         await ctx.respond(embed=embed) 
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def baladd(self, ctx, member: Option(discord.Member, "Which member to add cash to."), amount: Option(int, "How much to add.")):
         """
         Add cash to a user.
@@ -123,7 +123,7 @@ class Currency(commands.Cog):
         await memberaddcash(self, ctx.guild, member, amount)
         await ctx.respond(f"Added {amount} {lookup['currencyname']} to {member.name}.", ephemeral=True)
     
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def balremove(self, ctx, member: Option(discord.Member, "Which member to remove cash from."), amount: Option(int, "How much to remove.")):
         """
         Remove cash from a user.
@@ -140,7 +140,7 @@ class Currency(commands.Cog):
         await memberremovecash(self, ctx.guild, member, amount)
         await ctx.respond(f"Removed {amount} {lookup['currencyname']} from {member.name}.", ephemeral=True)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def give(self, ctx, member: Option(discord.Member, "Which member to give cash to."), amount: Option(int, "How much to give.")):
         """
         Give cash to a user.
@@ -155,7 +155,7 @@ class Currency(commands.Cog):
         await ctx.respond(f"Gave {amount} {lookup['currencyname']} to {member.name}.")
 
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def flipbet(self, ctx, amount: Option(int, "The amount you're betting."), *, bet: Option(str, "Heads or Tails.", autocomplete=discord.utils.basic_autocomplete(("Heads", "Tails")))):
         """
@@ -200,7 +200,7 @@ class Currency(commands.Cog):
             await ctx.respond(embed=embed)
             await memberremovecash(self, ctx.guild, ctx.author, amount)                
     
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def shop(self, ctx):
         """
         View the shop.
@@ -218,7 +218,7 @@ class Currency(commands.Cog):
             embed.description = "There are currently no items in the shop. Ask a moderator to make one."
         await ctx.respond(embed=embed)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def createitem(self, ctx, name: Option(str, "The name of the item."), price: Option(int, "The price of the item."), description: Option(str, "The description of the item.", required=False), reply: Option(str, "What to reply to the user when the user bought this item.", required=False), roletogive: Option(discord.Role, "The role to give to the user when they buy this item.", required=False)):
         """
         Create an item in the shop.
@@ -240,7 +240,7 @@ class Currency(commands.Cog):
         await self.bot.db.execute("INSERT INTO ccshop (guildid, name, price, description, reply, roletogive) VALUES ($1, $2, $3, $4, $5, $6)", ctx.guild.id, name, price, description, reply, roletogive.id)
         await ctx.respond(f"Created item `{name}` for {price} {lookup['currencyname']}.", ephemeral=True)
 
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def deleteitem(self, ctx, name: Option(str, "The name of the item.")):
         """
         Delete an item in the shop.
@@ -261,7 +261,7 @@ class Currency(commands.Cog):
         await self.bot.db.execute("DELETE FROM ccshop WHERE guildid = $1 AND name = $2", ctx.guild.id, name)
         await ctx.respond(f"Deleted item `{name}`.", ephemeral=True)
     
-    @slash_command(guild_ids=[940076462881513482])
+    @slash_command()
     async def buy(self, ctx, item: Option(str, "The name of the item to buy.")):
         """
         Buy an item in the shop.
