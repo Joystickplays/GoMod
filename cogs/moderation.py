@@ -108,7 +108,7 @@ class Moderation(commands.Cog):
         Kick a member from the server.
         """
         if not ctx.author.guild_permissions.kick_members:
-            await ctx.respond("You do not have permission to kick members.")
+            await ctx.respond("You do not have permission to kick members.", delete_after=3)
             return
         if member == ctx.author:
             await ctx.respond("You cannot kick yourself.", delete_after=3)
