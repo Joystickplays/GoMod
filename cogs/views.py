@@ -76,7 +76,7 @@ class Helpview(discord.ui.View):
         self.value = "s"
         self.stop()
 
-    @discord.ui.button(label='Logging', style=discord.ButtonStyle.gray)
+    @discord.ui.button(label='Logging', style=discord.ButtonStyle.gray, disabled=True)
     async def log(self, button: discord.ui.Button, interaction: discord.Interaction):
         if self.ctx.author != interaction.user:
             await interaction.response.send_message("You can't do this, sorry.", ephemeral=True)
@@ -92,6 +92,15 @@ class Helpview(discord.ui.View):
             return
 
         self.value = "mr"
+        self.stop()
+
+    @discord.ui.button(label='CC', style=discord.ButtonStyle.gray)
+    async def cc(self, button: discord.ui.Button, interaction: discord.Interaction):
+        if self.ctx.author != interaction.user:
+            await interaction.response.send_message("You can't do this, sorry.", ephemeral=True)
+            return
+
+        self.value = "cc"
         self.stop()
 
     @discord.ui.button(label='Others', style=discord.ButtonStyle.gray)

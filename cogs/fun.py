@@ -4,71 +4,71 @@ from discord.commands import slash_command, Option
 import asyncio
 from bot import GoModBot
 
-async def getc(self, user):
-        lookup = await self.bot.db.fetchrow("SELECT * FROM gocash WHERE uid = $1", user)
-        if lookup is None:
-            return 0
+# async def getc(self, user):
+#         lookup = await self.bot.db.fetchrow("SELECT * FROM gocash WHERE uid = $1", user)
+#         if lookup is None:
+#             return 0
 
-        return lookup['cash']
+#         return lookup['cash']
 
-async def increc(self, user, quan):
-        lookup = await self.bot.db.fetchrow("SELECT * FROM gocash WHERE uid = $1", user)
-        if lookup is None:
-            await self.bot.db.execute("INSERT INTO gocash (uid, cash) VALUES ($1, $2)", user, quan)
-        else:
-            await self.bot.db.execute("UPDATE gocash SET cash = cash + $1 WHERE uid = $2", quan, user)
+# async def increc(self, user, quan):
+#         lookup = await self.bot.db.fetchrow("SELECT * FROM gocash WHERE uid = $1", user)
+#         if lookup is None:
+#             await self.bot.db.execute("INSERT INTO gocash (uid, cash) VALUES ($1, $2)", user, quan)
+#         else:
+#             await self.bot.db.execute("UPDATE gocash SET cash = cash + $1 WHERE uid = $2", quan, user)
 
-async def decrec(self, user, quan):
-        lookup = await self.bot.db.fetchrow("SELECT * FROM gocash WHERE uid = $1", user)
-        if lookup is None:
-            return 0
-        else:
-            if int(lookup["cash"]) - int(quan) < 0:
-                return 0
+# async def decrec(self, user, quan):
+#         lookup = await self.bot.db.fetchrow("SELECT * FROM gocash WHERE uid = $1", user)
+#         if lookup is None:
+#             return 0
+#         else:
+#             if int(lookup["cash"]) - int(quan) < 0:
+#                 return 0
 
-            await self.bot.db.execute("UPDATE gocash SET cash = cash - $1 WHERE uid = $2", quan, user)
-            return 1
+#             await self.bot.db.execute("UPDATE gocash SET cash = cash - $1 WHERE uid = $2", quan, user)
+#             return 1
 
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
 
-    @slash_command()
-    async def gcbal(self, ctx, member: Option(discord.Member, "Which member to check.", required=False)):
-        """
-        Get the current balance of a user.
-        """
-        bal = await getc(self, ctx.author.id if member is None else member.id)
+    # @slash_command()
+    # async def gcbal(self, ctx, member: Option(discord.Member, "Which member to check.", required=False)):
+    #     """
+    #     Get the current balance of a user.
+    #     """
+    #     bal = await getc(self, ctx.author.id if member is None else member.id)
 
-        if member is None:
-            embed = discord.Embed(title="Balance", description=f"Your current GoCash balance is: {bal} GCs.", color=0x00b2ff)
-        else:
-            embed = discord.Embed(title="Balance", description=f"{member.name}'s current GoCash balance is: {bal} GCs.", color=0x00b2ff)
+    #     if member is None:
+    #         embed = discord.Embed(title="Balance", description=f"Your current GoCash balance is: {bal} GCs.", color=0x00b2ff)
+    #     else:
+    #         embed = discord.Embed(title="Balance", description=f"{member.name}'s current GoCash balance is: {bal} GCs.", color=0x00b2ff)
 
-        await ctx.respond(embed=embed)
+    #     await ctx.respond(embed=embed)
 
-    @slash_command()
-    async def givegc(self, ctx, member: Option(discord.Member, "Which member to give the GCs."), amount: Option(int, "The amount of GCs to give", min_value=1, default=1)):
-        """
-        Give GoCash to a user.
-        """
-        cash = await getc(self, ctx.author.id)
-        if member.id == ctx.author.id:
-            await ctx.respond("You can't give yourself GoCash.")
-            return
+    # @slash_command()
+    # async def givegc(self, ctx, member: Option(discord.Member, "Which member to give the GCs."), amount: Option(int, "The amount of GCs to give", min_value=1, default=1)):
+    #     """
+    #     Give GoCash to a user.
+    #     """
+    #     cash = await getc(self, ctx.author.id)
+    #     if member.id == ctx.author.id:
+    #         await ctx.respond("You can't give yourself GoCash.")
+    #         return
 
-        if amount < 0:
-            await ctx.respond("You can't give 0 or less GoCash.")
-            return
+    #     if amount < 0:
+    #         await ctx.respond("You can't give 0 or less GoCash.")
+    #         return
 
-        if cash < amount:
-            await ctx.respond("You don't have enough GoCash to give.")
-            return
+    #     if cash < amount:
+    #         await ctx.respond("You don't have enough GoCash to give.")
+    #         return
 
-        await decrec(self, ctx.author.id, amount)
-        await increc(self, member.id, amount)
-        await ctx.respond(f"You gave {amount} GC to {member.name}.")
+    #     await decrec(self, ctx.author.id, amount)
+    #     await increc(self, member.id, amount)
+    #     await ctx.respond(f"You gave {amount} GC to {member.name}.")
 
     # @commands.command()
     # async def modquiz(self, ctx):
