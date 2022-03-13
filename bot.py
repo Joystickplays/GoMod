@@ -1,6 +1,6 @@
 print('Loading cogs...')
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import os
 
 import asyncio
@@ -17,6 +17,7 @@ import sys
 import warnings
 import datetime
 from discord.commands import Option, permissions
+# from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from dotenv import load_dotenv
 
@@ -100,6 +101,7 @@ db_credentials = {
     'password': os.environ.get("DB_PASSWORD"),
     'database': os.environ.get("DB_NAME")
 }
+bot.post = os.environ.get("POST_TOKEN")
 bot.db = asyncio.get_event_loop().run_until_complete(asyncpg.create_pool(**db_credentials))
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
@@ -110,6 +112,7 @@ for filename in os.listdir('./cogs'):
 @bot.event
 async def on_ready():
     print("Ready")
+    updateguilds.start()
 
     # if not self.ticket_views_added:
     #     self.add_view(CreateTicket())
@@ -130,6 +133,20 @@ async def on_ready():
         tempdict["channel"] = ign["channel"]
         bot.logign.append(tempdict)
     print("Ignored logs cache fire!!!")
+
+@tasks.loop(seconds=60)
+async def updateguilds():
+    guildids = []
+    for guild in bot.guilds:
+        guildids.append(guild.id)
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post("https://GoModWeb.joystick101.repl.co/update_guild", data={"token":bot.post,"guilds":guildids}) as resp:
+            pass
+
+@updateguilds.before_loop
+async def before_updateguilds():
+    await bot.wait_until_ready()
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -171,6 +188,8 @@ async def on_guild_remove(guild):
 async def on_guild_join(guild):
     user = bot.get_user(534596269574979595) # me
     await user.send(f"I have been added to a new server: {guild.name}")
+
+
     
 
 # @bot.listen('on_message')
@@ -497,7 +516,11 @@ async def vote(ctx):
             if data['voted'] == 1:
                 await msg.edit(embed=discord.Embed(title="Vote", description="Yay! It looks like you already voted for this bot. Thank you!", color=0x00b2ff))
 
-
+# my unprofessionalism made me do this
+@bot.command()
+async def premium(ctx):
+    await ctx.trigger_typing()
+    await ctx.send(file=discord.File("funnyvideo.mp4"))
 
 # @bot.command()
 # @commands.has_permissions(manage_guild=True)
